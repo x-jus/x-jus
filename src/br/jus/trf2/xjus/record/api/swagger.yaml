@@ -1,0 +1,190 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: Jurindex - Record - API
+  description: Micro-serviço para obter dados para busca textual
+
+basePath: /mock/record/api/v1
+schemes: [http,https]
+consumes: [application/json]
+produces: [application/json]
+
+tags:
+  - name: index
+    description: Indexação
+
+paths:
+  /all-references:
+    get:
+      description: Retorna lista de IDs que devem ser indexadas. A lista será ordenada alfabeticamente pela ID e, caso seja informado o parâmetro id, a lista conterá apenas id posteriores.
+      tags: [index]
+      parameters:
+        - $ref: "#/parameters/id"
+        - $ref: "#/parameters/max"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              list:
+                type: array
+                items:
+                  $ref: "#/definitions/Reference"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /changed-references:
+    get:
+      description: Retorna lista de IDs que devem ser indexadas. A lista será ordenada pela data de inclusão ou modificação e, caso seja informado o parâmetro dt, a lista conterá apenas as datas posteriores.
+      tags: [index]
+      parameters:
+        - $ref: "#/parameters/dt"
+        - $ref: "#/parameters/max"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              list:
+                type: array
+                items:
+                  $ref: "#/definitions/Reference"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /record/{id}:
+    get:
+      description: Obtem informações sobre determinado item, a partir de uma id. Caso o item tenha sido removido, este método deve retornar 500 com a errormsg "REMOVED".
+      tags: [index]
+      parameters:
+        - $ref: "#/parameters/id"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: "#/definitions/Id"
+              acl:
+                $ref: "#/definitions/Acl"
+              refresh:
+                $ref: "#/definitions/Refresh"
+              url:
+                $ref: "#/definitions/Url"
+              code:
+                $ref: "#/definitions/Code"
+              title:
+                $ref: "#/definitions/Title"
+              content:
+                $ref: "#/definitions/Content"
+              field:
+                type: array
+                items:
+                  $ref: "#/definitions/Field"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+parameters:
+  id:
+    name: id
+    in: path
+    description: String que identifica um item, normalmente uma concatenação do tipo do item seguida de ':' e o número do identificar do item formatado com zeros à esquerda.
+    required: true
+    type: string
+  dt:
+    name: dt
+    in: path
+    description: String que representa uma data.
+    required: true
+    type: string
+    format: date-time
+  max:
+    name: max
+    in: path
+    description: Número máximo de IDs que pode ser retornado em uma consulta.
+    required: true
+    type: number
+
+definitions:
+  Id:
+    type: string
+    description: String que identifica um item, normalmente uma concatenação do tipo do item seguida de ':' e o número do identificar do item formatado com zeros à esquerda.
+    example: documento:000000000123
+    
+  Object:
+    description: Objecto que deve ser indexado. Geralmente será informado o mesmo nome de objeto que está no início da ID, antes dos dois-pontos.
+    type: string      
+    example: documento
+    
+  Acl:
+    description: Lista, separada por vírgulas, de controle de acesso que indica se o item deve ou não ser incluído no resultado da busca em função das credenciais de acesso do usuário em questão. Itens públicos deverão ser marcados com PUBLIC.
+    type: string      
+    example: PUBLIC
+    
+  Refresh:
+    description: Indica se a informação pode sofrer alteração e deve ser reindexada ou se não sofre alteração. As opções são OFTEN, SELDOM e NEVER.
+    type: string      
+    example: NEVER
+    
+  Url:
+    description: URL que para onde o usuário deve ser direcionado quando clicar no resultado da busca.
+    type: string      
+    example: https://siga.jfrj.jus.br/permalink/TRF2MEM2018000001
+    
+  Code:
+    description: Código do item que deve ser apresentado no resultado da busca.
+    type: string      
+    example: TRF2-MEM-2018/000001
+    
+  Title:
+    description: Título que deve ser apresentado no resultado da busca.
+    type: string      
+    example: Memorando de marcação de férias para Renato
+    
+  Content:
+    description: Texto que deve ser indexado para a busca.
+    type: string      
+    example: Batatinha quando nasce espalha a rama pelo chão. menininha quando dorme põe a mão no coração. O bolso furou e o papai caiu no chão. Mamãe que é mais querida ficou no coração.
+
+  Field:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome do campo
+      kind:
+        type: string
+        description: Tipo do campo, os valores possíveis são TEXT, KEYWORD, LONG, FLOAT, DATE, BOOLEAN e BINARY.
+      value:
+        type: string
+        description: Valor do campo
+    example:
+      name: idade
+      kind: LONG
+      value: 42
+
+  Reference:
+    type: object
+    properties:
+      id:
+        $ref: "#/definitions/Id"
+    example:
+      id: documento:000000000123
+
+  Error:
+    type: object
+    properties:
+      errormsg:
+        type: string
+    example:
+      error: Não foi possível realizar a operação

@@ -1,0 +1,76 @@
+<div
+	cg-busy="{promise:promise,message:'Aguarde, por favor...',delay:1000,templateUrl:'/resources/busy.html'}">
+
+	<div class="wrapper">
+		<div class="container content">
+
+
+			<table ng-show="editing === undefined"
+				class="table table-striped table-bordered">
+				<thead class="thead-dark">
+					<tr>
+						<th scope="col">Índice</th>
+						<th scope="col">Registros</th>
+						<th scope="col">Status</th>
+						<th scope="col">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="i in indexes">
+						<td>{{i.idx}}</td>
+						<td>{{i.records}}</td>
+						<td>{{status($index)}}</td>
+						<td>
+							<button ng-click="search($index)" type="button"
+								class="btn btn-primary btn-sm">Pesquisar</button>
+							<button ng-click="refresh($index)" type="button"
+								class="btn btn-secondary btn-sm">Reindexar</button>
+							<button ng-click="edit($index)" type="button"
+								class="btn btn-secondary btn-sm">Editar</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<button ng-click="create()" type="button"
+				class="btn btn-secondary btn-sm">Criar índice</button>
+
+			<div ng-show="editing !== undefined" class="card">
+				<div class="card-body">
+					<form>
+						<div class="form-row">
+							<div class="form-group col-md-4">
+								<label for="name">Identificador</label> <input ng-model="idx"
+									type="text" class="form-control" id="name"
+									aria-describedby="identificadorHelp" placeholder=""> <small
+									id="identificadorHelp" class="form-text text-muted">Use
+									apenas minúsculas, número e hífen.</small>
+							</div>
+							<div class="form-group col-md-8">
+								<label for="descr">Descrição</label> <input ng-model="descr"
+									type="text" class="form-control" id="descr" placeholder="">
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group col-md-6">
+								<label for="api">URL da API</label> <input ng-model="api"
+									type="text" class="form-control" id="api" placeholder="">
+							</div>
+							<div class="form-group col-md-6">
+								<label for="jwt">Token JWT</label> <input ng-model="token"
+									type="text" class="form-control" id="jwt" placeholder="">
+							</div>
+						</div>
+						<div class="form-group form-check">
+							<input ng-model="active" type="checkbox" class="form-check-input"
+								id="ativo"> <label class="form-check-label" for="ativo">Ativo</label>
+						</div>
+						<button ng-click="save()" class="btn btn-primary">Gravar</button>
+						<button ng-show="editing !== -1" ng-click="remove()"
+							class="btn btn-secondary">Excluir</button>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
