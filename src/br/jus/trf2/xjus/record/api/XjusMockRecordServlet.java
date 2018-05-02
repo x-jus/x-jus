@@ -11,7 +11,7 @@ import com.crivano.gae.HttpGAE;
 import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerServlet;
 
-public class JurindexMockRecordServlet extends SwaggerServlet {
+public class XjusMockRecordServlet extends SwaggerServlet {
 	private static final long serialVersionUID = 1756711359239182178L;
 
 	@Override
@@ -20,7 +20,7 @@ public class JurindexMockRecordServlet extends SwaggerServlet {
 
 		SwaggerCall.setHttp(new HttpGAE());
 
-		super.setAPI(IJurindexRecordAPI.class);
+		super.setAPI(IXjusRecordAPI.class);
 
 		super.setActionPackage("br.jus.trf2.xjus.record.api");
 	}

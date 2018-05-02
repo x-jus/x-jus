@@ -8,7 +8,7 @@ import com.crivano.swaggerservlet.ISwaggerModel;
 import com.crivano.swaggerservlet.ISwaggerRequest;
 import com.crivano.swaggerservlet.ISwaggerResponse;
 
-public interface IJurindexRecordAPI {
+public interface IXjusRecordAPI {
 	public class Id implements ISwaggerModel {
 	}
 

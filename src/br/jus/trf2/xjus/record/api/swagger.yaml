@@ -2,7 +2,7 @@ swagger: '2.0'
 
 info:
   version: "1.0.0"
-  title: Jurindex - Record - API
+  title: Xjus - Record - API
   description: Micro-serviço para obter dados para busca textual
 
 basePath: /mock/record/api/v1

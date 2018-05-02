@@ -6,9 +6,9 @@ import java.util.logging.Logger;
 
 import br.jus.trf2.xjus.IXjus.IndexIdxRefreshPostRequest;
 import br.jus.trf2.xjus.IXjus.IndexIdxRefreshPostResponse;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.AllReferencesGetResponse;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.RecordIdGetResponse;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.Reference;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetResponse;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
 import com.crivano.gae.Dao;
 import com.crivano.gae.HttpGAE;

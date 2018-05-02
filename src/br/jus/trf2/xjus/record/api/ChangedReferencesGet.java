@@ -2,12 +2,12 @@ package br.jus.trf2.xjus.record.api;
 
 import java.util.ArrayList;
 
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.ChangedReferencesGetRequest;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.ChangedReferencesGetResponse;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.Reference;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetRequest;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
 public class ChangedReferencesGet implements
-		IJurindexRecordAPI.IChangedReferencesGet {
+		IXjusRecordAPI.IChangedReferencesGet {
 
 	@Override
 	public void run(ChangedReferencesGetRequest req,

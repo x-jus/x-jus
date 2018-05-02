@@ -3,7 +3,7 @@ package com.crivano.gae;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.Facet;
@@ -98,7 +98,7 @@ public class Search {
 					.setText(r.title));
 
 		if (r.field != null) {
-			for (br.jus.trf2.xjus.record.api.IJurindexRecordAPI.Field f : r.field) {
+			for (br.jus.trf2.xjus.record.api.IXjusRecordAPI.Field f : r.field) {
 				builder.addField(Field.newBuilder().setName(f.name)
 						.setAtom(f.value));
 				builder.addFacet(Facet.withAtom(f.name, f.value));

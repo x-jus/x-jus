@@ -2,11 +2,11 @@ package br.jus.trf2.xjus.record.api;
 
 import java.util.ArrayList;
 
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.Field;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.RecordIdGetRequest;
-import br.jus.trf2.xjus.record.api.IJurindexRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Field;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetRequest;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 
-public class RecordIdGet implements IJurindexRecordAPI.IRecordIdGet {
+public class RecordIdGet implements IXjusRecordAPI.IRecordIdGet {
 
 	@Override
 	public void run(RecordIdGetRequest req, RecordIdGetResponse resp)
