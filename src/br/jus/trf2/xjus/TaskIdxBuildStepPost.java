@@ -54,10 +54,13 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 
 		// Verify the number of tasks in the queue to avoid a fork-bomb
 		QueueStatistics stats = queue.fetchStatistics();
-		if (stats.getNumTasks() > MAX_INDEXES
-				+ 2
-				* (idx.maxBuild == null ? MAX_PER_MINUTE_DEFAULT : idx.maxBuild))
+		if (stats.getNumTasks() > (MAX_INDEXES + 2 * (idx.maxBuild == null ? MAX_PER_MINUTE_DEFAULT
+				: idx.maxBuild))) {
+			System.out.println("índice " + req.idx
+					+ " - adiando atualização pois há muitas tarefas ativas - "
+					+ stats.getNumTasks());
 			return;
+		}
 
 		// Query changed IDs since last update
 		String qs = "?max="
