@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import br.jus.trf2.xjus.Index;
+import br.jus.trf2.xjus.IndexBuildStatus;
+import br.jus.trf2.xjus.IndexRefreshStatus;
 import br.jus.trf2.xjus.IndexStatus;
 
 import com.googlecode.objectify.ObjectifyFactory;
@@ -29,6 +31,8 @@ public class ObjectifyFactoryCreator {
 
 		register(Index.class);
 		register(IndexStatus.class);
+		register(IndexBuildStatus.class);
+		register(IndexRefreshStatus.class);
 	}
 
 	public static ObjectifyFactory getInstance() {

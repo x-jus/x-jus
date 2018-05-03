@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queue-entries>
+	<queue>
+		<name>queue-build</name>
+		<rate>100/s</rate>
+		<bucket-size>100</bucket-size>
+		<max-concurrent-requests>100</max-concurrent-requests>
+	</queue>
+	<queue>
+		<name>queue-refresh</name>
+		<rate>10/s</rate>
+		<bucket-size>10</bucket-size>
+		<max-concurrent-requests>10</max-concurrent-requests>
+	</queue>
+</queue-entries>

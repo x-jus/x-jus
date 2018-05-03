@@ -47,6 +47,9 @@ public interface IXjusRecordAPI {
 		public String value;
 	}
 
+	public class Status implements ISwaggerModel {
+	}
+
 	public class Reference implements ISwaggerModel {
 		public String id;
 	}
@@ -65,7 +68,8 @@ public interface IXjusRecordAPI {
 	}
 
 	public interface IAllReferencesGet extends ISwaggerMethod {
-		public void run(AllReferencesGetRequest req, AllReferencesGetResponse resp) throws Exception;
+		public void run(AllReferencesGetRequest req,
+				AllReferencesGetResponse resp) throws Exception;
 	}
 
 	public class ChangedReferencesGetRequest implements ISwaggerRequest {
@@ -79,7 +83,8 @@ public interface IXjusRecordAPI {
 	}
 
 	public interface IChangedReferencesGet extends ISwaggerMethod {
-		public void run(ChangedReferencesGetRequest req, ChangedReferencesGetResponse resp) throws Exception;
+		public void run(ChangedReferencesGetRequest req,
+				ChangedReferencesGetResponse resp) throws Exception;
 	}
 
 	public class RecordIdGetRequest implements ISwaggerRequest {
@@ -88,6 +93,7 @@ public interface IXjusRecordAPI {
 
 	public class RecordIdGetResponse implements ISwaggerResponse {
 		public String id;
+		public String status;
 		public String acl;
 		public String refresh;
 		public String url;
@@ -99,7 +105,8 @@ public interface IXjusRecordAPI {
 	}
 
 	public interface IRecordIdGet extends ISwaggerMethod {
-		public void run(RecordIdGetRequest req, RecordIdGetResponse resp) throws Exception;
+		public void run(RecordIdGetRequest req, RecordIdGetResponse resp)
+				throws Exception;
 	}
 
 }

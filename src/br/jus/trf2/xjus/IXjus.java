@@ -53,7 +53,10 @@ public interface IXjus {
 	public class Active implements ISwaggerModel {
 	}
 
-	public class Max implements ISwaggerModel {
+	public class MaxBuild implements ISwaggerModel {
+	}
+
+	public class MaxRefresh implements ISwaggerModel {
 	}
 
 	public class Records implements ISwaggerModel {
@@ -83,7 +86,8 @@ public interface IXjus {
 		public String api;
 		public String token;
 		public Boolean active;
-		public String max;
+		public String maxBuild;
+		public String maxRefresh;
 		public String records;
 		public String last;
 	}
@@ -133,7 +137,8 @@ public interface IXjus {
 		public String api;
 		public String token;
 		public Boolean active;
-		public String max;
+		public String maxBuild;
+		public String maxRefresh;
 	}
 
 	public class IndexIdxPostResponse implements ISwaggerResponse {
@@ -241,29 +246,54 @@ public interface IXjus {
 				IndexIdxRecordIdRefreshPostResponse resp) throws Exception;
 	}
 
-	public class TaskStepGetRequest implements ISwaggerRequest {
+	public class TaskBuildStepGetRequest implements ISwaggerRequest {
 	}
 
-	public class TaskStepGetResponse implements ISwaggerResponse {
+	public class TaskBuildStepGetResponse implements ISwaggerResponse {
 		public String status;
 	}
 
-	public interface ITaskStepGet extends ISwaggerMethod {
-		public void run(TaskStepGetRequest req, TaskStepGetResponse resp)
-				throws Exception;
+	public interface ITaskBuildStepGet extends ISwaggerMethod {
+		public void run(TaskBuildStepGetRequest req,
+				TaskBuildStepGetResponse resp) throws Exception;
 	}
 
-	public class TaskIdxStepPostRequest implements ISwaggerRequest {
+	public class TaskIdxBuildStepPostRequest implements ISwaggerRequest {
 		public String idx;
 	}
 
-	public class TaskIdxStepPostResponse implements ISwaggerResponse {
+	public class TaskIdxBuildStepPostResponse implements ISwaggerResponse {
 		public String status;
 	}
 
-	public interface ITaskIdxStepPost extends ISwaggerMethod {
-		public void run(TaskIdxStepPostRequest req, TaskIdxStepPostResponse resp)
-				throws Exception;
+	public interface ITaskIdxBuildStepPost extends ISwaggerMethod {
+		public void run(TaskIdxBuildStepPostRequest req,
+				TaskIdxBuildStepPostResponse resp) throws Exception;
+	}
+
+	public class TaskRefreshStepGetRequest implements ISwaggerRequest {
+	}
+
+	public class TaskRefreshStepGetResponse implements ISwaggerResponse {
+		public String status;
+	}
+
+	public interface ITaskRefreshStepGet extends ISwaggerMethod {
+		public void run(TaskRefreshStepGetRequest req,
+				TaskRefreshStepGetResponse resp) throws Exception;
+	}
+
+	public class TaskIdxRefreshStepPostRequest implements ISwaggerRequest {
+		public String idx;
+	}
+
+	public class TaskIdxRefreshStepPostResponse implements ISwaggerResponse {
+		public String status;
+	}
+
+	public interface ITaskIdxRefreshStepPost extends ISwaggerMethod {
+		public void run(TaskIdxRefreshStepPostRequest req,
+				TaskIdxRefreshStepPostResponse resp) throws Exception;
 	}
 
 }

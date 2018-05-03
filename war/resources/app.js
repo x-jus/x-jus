@@ -35,7 +35,8 @@ app.controller('ctrl', function($scope, $http, $location) {
 		$scope.api = $scope.indexes[i].api;
 		$scope.token = $scope.indexes[i].token;
 		$scope.active = $scope.indexes[i].active;
-		$scope.max = $scope.indexes[i].max;
+		$scope.maxBuild = $scope.indexes[i].maxBuild;
+		$scope.maxRefresh = $scope.indexes[i].maxRefresh;
 	}
 
 	$scope.save = function() {
@@ -53,7 +54,8 @@ app.controller('ctrl', function($scope, $http, $location) {
 				api : $scope.api,
 				token : $scope.token,
 				active : $scope.active,
-				max : $scope.max
+				maxBuild : $scope.maxBuild,
+				maxRefresh : $scope.maxRefresh
 			}
 		}).then(function(response) {
 			$scope.indexes[i] = response.data.index;
@@ -89,7 +91,8 @@ app.controller('ctrl', function($scope, $http, $location) {
 		$scope.descr = undefined;
 		$scope.api = undefined;
 		$scope.token = undefined;
-		$scope.max = undefined;
+		$scope.maxBuild = undefined;
+		$scope.maxRefresh = undefined;
 		$scope.active = false;
 	}
 

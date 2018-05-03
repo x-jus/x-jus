@@ -13,7 +13,6 @@ public class IndexStatus {
 	public String idx;
 
 	public Date lastModified;
-	public String last;
 	public Long records;
 	public Long size;
 }

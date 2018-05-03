@@ -20,8 +20,8 @@ public class IndexIdxRecordIdRefreshPost implements
 	@Override
 	public void run(IndexIdxRecordIdRefreshPostRequest req,
 			IndexIdxRecordIdRefreshPostResponse resp) throws Exception {
-		System.out.println("atualizando índice " + req.idx + " - registro "
-				+ req.id);
+		System.out.println("índice " + req.idx + " - registro " + req.id
+				+ " - buscando");
 
 		Dao dao = new Dao();
 		Key<Index> key = Key.create(Index.class, req.idx);
@@ -35,8 +35,16 @@ public class IndexIdxRecordIdRefreshPost implements
 								new URL(idx.api + "/record/" + req.id),
 								HTTPMethod.GET, null, null).get().getContent(),
 						StandardCharsets.UTF_8), RecordIdGetResponse.class);
-		Document d = Search.buildDocument(r);
-		Search.indexADocument(req.idx, d);
+		if ("REMOVED".equals(r.status)) {
+			Search.deleteDocument(req.idx, r.id);
+			System.out.println("índice " + req.idx + " - registro " + req.id
+					+ " - removido");
+		} else {
+			Document d = Search.buildDocument(r);
+			Search.indexADocument(req.idx, d);
+			System.out.println("índice " + req.idx + " - registro " + req.id
+					+ " - gravado");
+		}
 	}
 
 	public String getContext() {

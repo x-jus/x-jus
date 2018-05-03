@@ -4,8 +4,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
-import br.jus.trf2.xjus.IXjus.TaskIdxStepPostRequest;
-import br.jus.trf2.xjus.IXjus.TaskIdxStepPostResponse;
+import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostRequest;
+import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
@@ -22,7 +22,7 @@ import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.urlfetch.HTTPMethod;
 import com.googlecode.objectify.Key;
 
-public class TaskIdxStepPost implements IXjus.ITaskIdxStepPost {
+public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 
 	private static final int TASK_AGE_LIMIT_SECONDS = 3600 * 24 * 7; // 7 days
 	private static final int MIN_TASK_BACKOFF = 600; // 10 minute
@@ -35,9 +35,9 @@ public class TaskIdxStepPost implements IXjus.ITaskIdxStepPost {
 			.maxBackoffSeconds(MAX_TASK_BACKOFF);
 
 	@Override
-	public void run(TaskIdxStepPostRequest req, TaskIdxStepPostResponse resp)
-			throws Exception {
-		Queue queue = QueueFactory.getDefaultQueue();
+	public void run(TaskIdxBuildStepPostRequest req,
+			TaskIdxBuildStepPostResponse resp) throws Exception {
+		Queue queue = QueueFactory.getQueue(TaskBuildStepGet.QUEUE_BUILD);
 		resp.status = "OK";
 
 		System.out.println("atualizando índice " + req.idx);
@@ -48,18 +48,20 @@ public class TaskIdxStepPost implements IXjus.ITaskIdxStepPost {
 		if (idx == null)
 			return;
 
-		Key<IndexStatus> keyStatus = Key.create(IndexStatus.class, req.idx);
-		IndexStatus sts = dao.load(keyStatus);
+		Key<IndexBuildStatus> keyStatus = Key.create(IndexBuildStatus.class,
+				req.idx);
+		IndexBuildStatus sts = dao.load(keyStatus);
 
 		// Verify the number of tasks in the queue to avoid a fork-bomb
 		QueueStatistics stats = queue.fetchStatistics();
-		if (stats.getNumTasks() > MAX_INDEXES + 2
-				* (idx.max == null ? MAX_PER_MINUTE_DEFAULT : idx.max))
+		if (stats.getNumTasks() > MAX_INDEXES
+				+ 2
+				* (idx.maxBuild == null ? MAX_PER_MINUTE_DEFAULT : idx.maxBuild))
 			return;
 
 		// Query changed IDs since last update
 		String qs = "?max="
-				+ (idx.max == null ? MAX_PER_MINUTE_DEFAULT : idx.max);
+				+ (idx.maxBuild == null ? MAX_PER_MINUTE_DEFAULT : idx.maxBuild);
 		if (sts != null && sts.last != null)
 			qs += "&last=" + sts.last;
 		ChangedReferencesGetResponse changedRefs = (ChangedReferencesGetResponse) SwaggerUtils
@@ -90,7 +92,7 @@ public class TaskIdxStepPost implements IXjus.ITaskIdxStepPost {
 
 		// Update IndexStatus
 		if (sts == null) {
-			sts = new IndexStatus();
+			sts = new IndexBuildStatus();
 			sts.idx = req.idx;
 			sts.records = 0L;
 		}

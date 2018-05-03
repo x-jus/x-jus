@@ -63,7 +63,7 @@ paths:
 
   /record/{id}:
     get:
-      description: Obtem informações sobre determinado item, a partir de uma id. Caso o item tenha sido removido, este método deve retornar 500 com a errormsg "REMOVED".
+      description: Obtem informações sobre determinado item, a partir de uma id. Caso o item tenha sido removido, este método deve retornar apenas a ID e o status, que deve ser preechido com "REMOVED".
       tags: [index]
       parameters:
         - $ref: "#/parameters/id"
@@ -75,6 +75,8 @@ paths:
             properties:
               id:
                 $ref: "#/definitions/Id"
+              status:
+                $ref: "#/definitions/Status"
               acl:
                 $ref: "#/definitions/Acl"
               refresh:
@@ -198,6 +200,11 @@ definitions:
       name: idade
       kind: FLOAT
       value: 42
+
+  Status:
+    description: Texto que indica se um registro está ativo ou se deve ser removido do índice. As opções são ACTIVE, REMOVED.
+    type: string      
+    example: ACTIVE
 
   Reference:
     type: object

@@ -117,6 +117,13 @@ public class Search {
 		return doc;
 	}
 
+	public static void deleteDocument(String indexName, String id) {
+		IndexSpec indexSpec = IndexSpec.newBuilder().setName(indexName).build();
+		com.google.appengine.api.search.Index index = SearchServiceFactory
+				.getSearchService().getIndex(indexSpec);
+		index.delete(id);
+	}
+
 	public static long deleteIndex(String indexName) {
 		IndexSpec indexSpec = IndexSpec.newBuilder().setName(indexName).build();
 		com.google.appengine.api.search.Index index = SearchServiceFactory
@@ -144,4 +151,38 @@ public class Search {
 		}
 		return l;
 	}
+
+	public static List<String> getDocumentIds(String indexName, String startId,
+			int count) {
+		IndexSpec indexSpec = IndexSpec.newBuilder().setName(indexName).build();
+		com.google.appengine.api.search.Index index = SearchServiceFactory
+				.getSearchService().getIndex(indexSpec);
+
+		List<String> docIds = new ArrayList<>();
+		String id = startId;
+		int i = 0;
+
+		// looping because getRange by default returns up to 100 documents
+		// at a time
+		while (true) {
+			// Return a set of doc_ids.
+			GetRequest request = GetRequest.newBuilder()
+					.setReturningIdsOnly(true).setStartId(id)
+					.setLimit(count - i > 100 ? 100 : count - i)
+					.setIncludeStart(false).build();
+			GetResponse<Document> response = index.getRange(request);
+			if (response.getResults().isEmpty()) {
+				break;
+			}
+			for (Document doc : response) {
+				id = doc.getId();
+				docIds.add(id);
+				i++;
+			}
+			if (count <= i)
+				break;
+		}
+		return docIds;
+	}
+
 }

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
 	<cron>
-		<url>/api/v1/task/step</url>
-		<description>Agenda tarefas para atualizar os índices</description>
+		<url>/api/v1/task/build-step</url>
+		<description>Agenda tarefas para construir os índices</description>
 		<schedule>every 1 minutes</schedule>
+	</cron>
+	<cron>
+		<url>/api/v1/task/refresh-step</url>
+		<description>Agenda tarefas para revisar os índices</description>
+		<schedule>every 10 minutes</schedule>
 	</cron>
 </cronentries>

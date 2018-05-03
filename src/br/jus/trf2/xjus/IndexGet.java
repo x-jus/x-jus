@@ -26,10 +26,12 @@ public class IndexGet implements IXjus.IIndexGet {
 			i.descr = idx.descr;
 			i.api = idx.api;
 			i.token = idx.token;
-			if (idx.max != null)
-				i.max = idx.max.toString();
+			if (idx.maxBuild != null)
+				i.maxBuild = idx.maxBuild.toString();
+			if (idx.maxRefresh != null)
+				i.maxRefresh = idx.maxRefresh.toString();
 
-			IndexStatus sts = dao.load(Key.create(IndexStatus.class, i.idx));
+			IndexBuildStatus sts = dao.load(Key.create(IndexBuildStatus.class, i.idx));
 			if (sts != null) {
 				i.records = sts.records.toString();
 				i.last = sts.last;

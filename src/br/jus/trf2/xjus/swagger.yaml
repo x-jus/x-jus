@@ -50,7 +50,8 @@ paths:
         - $ref: "#/parameters/api"
         - $ref: "#/parameters/token"
         - $ref: "#/parameters/active"
-        - $ref: "#/parameters/max"
+        - $ref: "#/parameters/maxBuild"
+        - $ref: "#/parameters/maxRefresh"
       responses:
         200:
           description: Successful response
@@ -210,7 +211,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /task/step:
+  /task/build-step:
     get:
       description: Cria um task de build para cada um dos índices ativos
       tags: [task]
@@ -228,9 +229,46 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /task/{idx}/step:
+  /task/{idx}/build-step:
     post:
-      description: Se não houver um número muito grande de tasks na lista, chama o webservice de registros para obter a próxima lista de IDs, atualizada o progresso e cria um task para buscar o registro de cada uma das IDs
+      description: Se não houver um número muito grande de tasks na lista, chama o webservice de registros para obter a próxima lista de IDs, ordenada pela data da última alteração, atualizada o progresso e cria um task para buscar o registro de cada uma das IDs
+      tags: [task]
+      parameters:
+        - $ref: "#/parameters/idx"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: "#/definitions/Status"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /task/refresh-step:
+    get:
+      description: Cria um task de refresh-step para cada um dos índices ativos
+      tags: [task]
+      parameters: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: "#/definitions/Status"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /task/{idx}/refresh-step:
+    post:
+      description: Se não houver um número muito grande de tasks na lista, chama o webservice de registros para obter a próxima lista de IDs, ordenada por ID, atualizada o progresso e cria um task para buscar o registro de cada uma das IDs
       tags: [task]
       parameters:
         - $ref: "#/parameters/idx"
@@ -327,10 +365,16 @@ parameters:
     description: Habilita ou desabilita o índice.
     required: true
     type: boolean
-  max:
-    name: max
+  maxBuild:
+    name: maxBuild
     in: formData
     description: Número máximo de IDs que pode ser retornado em uma consulta. Considerando que a cada minuto a aplicação verifica se existem novos itens a serem acrescidos ao índice, esse número também reflete a velocidade que o índice é contruido, em itens por minuto.
+    required: true
+    type: string
+  maxRefresh:
+    name: maxRefresh
+    in: formData
+    description: Número máximo de IDs que pode ser retornado em uma consulta. Considerando que a cada minuto a aplicação verifica se existem novos itens a serem acrescidos ao índice, esse número também reflete a velocidade que o índice é revisado, em itens a cada 10 minutos.
     required: true
     type: string
 
@@ -405,13 +449,17 @@ definitions:
     description: Se o índice está ativo ou não
     type: boolean
     example: true
-  Max:
-    description: Quantidade de registros que podem ser recuperado de uma só vez na Record API
+  MaxBuild:
+    description: Quantidade de registros que podem ser recuperado de uma só vez na Record API para changed-references
+    type: string
+    example: 50
+  MaxRefresh:
+    description: Quantidade de registros que podem ser recuperado de uma só vez na Record API para all-references
     type: string
     example: 50
   Records:
     description: Quantidade de registros no índice
-    type: number      
+    type: string      
     example: 1234
   Last:
     description: Última data (ou localizador) que foi submetido à Record API
@@ -462,12 +510,14 @@ definitions:
         $ref: "#/definitions/Token"
       active:
         $ref: "#/definitions/Active"
-      max:
-        $ref: "#/definitions/Max"
+      maxBuild:
+        $ref: "#/definitions/MaxBuild"
+      maxRefresh:
+        $ref: "#/definitions/MaxRefresh"
       records:
-        $ref: "#/definitions/Max"
+        $ref: "#/definitions/Records"
       last:
-        $ref: "#/definitions/Max"
+        $ref: "#/definitions/Last"
 
   Facet:
     type: object
