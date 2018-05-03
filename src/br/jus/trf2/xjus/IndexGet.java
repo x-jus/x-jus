@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.crivano.gae.Dao;
+import com.googlecode.objectify.Key;
 
 import br.jus.trf2.xjus.IXjus.IndexGetRequest;
 import br.jus.trf2.xjus.IXjus.IndexGetResponse;
@@ -25,7 +26,14 @@ public class IndexGet implements IXjus.IIndexGet {
 			i.descr = idx.descr;
 			i.api = idx.api;
 			i.token = idx.token;
-			// i.records = 2345.0;
+			if (idx.max != null)
+				i.max = idx.max.toString();
+
+			IndexStatus sts = dao.load(Key.create(IndexStatus.class, i.idx));
+			if (sts != null) {
+				i.records = sts.records.toString();
+				i.last = sts.last;
+			}
 			resp.list.add(i);
 		}
 	}

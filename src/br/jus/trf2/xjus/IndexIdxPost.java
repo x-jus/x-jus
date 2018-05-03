@@ -23,6 +23,8 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 		idx.api = req.api;
 		idx.token = req.token;
 		idx.active = req.active;
+		if (req.max != null)
+			idx.max = Integer.parseInt(req.max);
 		dao.save(idx);
 
 		resp.index = new SearchIndex();
@@ -31,6 +33,8 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 		resp.index.api = idx.api;
 		resp.index.token = idx.token;
 		resp.index.active = idx.active;
+		if (idx.max != null)
+			resp.index.max = idx.max.toString();
 	}
 
 	public String getContext() {

@@ -17,6 +17,8 @@ tags:
     description: Busca Textual
   - name: index
     description: Controle da Indexação
+  - name: task
+    description: Automação da montagem dos índices
 
 paths:
   /index:
@@ -48,6 +50,7 @@ paths:
         - $ref: "#/parameters/api"
         - $ref: "#/parameters/token"
         - $ref: "#/parameters/active"
+        - $ref: "#/parameters/max"
       responses:
         200:
           description: Successful response
@@ -207,6 +210,43 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /task/step:
+    get:
+      description: Cria um task de build para cada um dos índices ativos
+      tags: [task]
+      parameters: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: "#/definitions/Status"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /task/{idx}/step:
+    post:
+      description: Se não houver um número muito grande de tasks na lista, chama o webservice de registros para obter a próxima lista de IDs, atualizada o progresso e cria um task para buscar o registro de cada uma das IDs
+      tags: [task]
+      parameters:
+        - $ref: "#/parameters/idx"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: "#/definitions/Status"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
 parameters:
   filter:
     name: filter
@@ -245,12 +285,6 @@ parameters:
     required: true
     type: string
     format: date-time
-  max:
-    name: max
-    in: path
-    description: Número máximo de IDs que pode ser retornado em uma consulta.
-    required: true
-    type: number
   sync:
     name: sync
     in: query
@@ -293,6 +327,12 @@ parameters:
     description: Habilita ou desabilita o índice.
     required: true
     type: boolean
+  max:
+    name: max
+    in: formData
+    description: Número máximo de IDs que pode ser retornado em uma consulta. Considerando que a cada minuto a aplicação verifica se existem novos itens a serem acrescidos ao índice, esse número também reflete a velocidade que o índice é contruido, em itens por minuto.
+    required: true
+    type: string
 
 definitions:
   Id:
@@ -365,10 +405,18 @@ definitions:
     description: Se o índice está ativo ou não
     type: boolean
     example: true
+  Max:
+    description: Quantidade de registros que podem ser recuperado de uma só vez na Record API
+    type: string
+    example: 50
   Records:
     description: Quantidade de registros no índice
     type: number      
     example: 1234
+  Last:
+    description: Última data (ou localizador) que foi submetido à Record API
+    type: string      
+    example: 2018-05-02T01:02:03.456-02:00
   Status:
     description: Identificador do status índice
     type: string      
@@ -414,8 +462,12 @@ definitions:
         $ref: "#/definitions/Token"
       active:
         $ref: "#/definitions/Active"
+      max:
+        $ref: "#/definitions/Max"
       records:
-        $ref: "#/definitions/Records"
+        $ref: "#/definitions/Max"
+      last:
+        $ref: "#/definitions/Max"
 
   Facet:
     type: object

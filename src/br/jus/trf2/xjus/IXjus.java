@@ -53,7 +53,13 @@ public interface IXjus {
 	public class Active implements ISwaggerModel {
 	}
 
+	public class Max implements ISwaggerModel {
+	}
+
 	public class Records implements ISwaggerModel {
+	}
+
+	public class Last implements ISwaggerModel {
 	}
 
 	public class Status implements ISwaggerModel {
@@ -77,7 +83,9 @@ public interface IXjus {
 		public String api;
 		public String token;
 		public Boolean active;
-		public Double records;
+		public String max;
+		public String records;
+		public String last;
 	}
 
 	public class Facet implements ISwaggerModel {
@@ -125,6 +133,7 @@ public interface IXjus {
 		public String api;
 		public String token;
 		public Boolean active;
+		public String max;
 	}
 
 	public class IndexIdxPostResponse implements ISwaggerResponse {
@@ -230,6 +239,31 @@ public interface IXjus {
 	public interface IIndexIdxRecordIdRefreshPost extends ISwaggerMethod {
 		public void run(IndexIdxRecordIdRefreshPostRequest req,
 				IndexIdxRecordIdRefreshPostResponse resp) throws Exception;
+	}
+
+	public class TaskStepGetRequest implements ISwaggerRequest {
+	}
+
+	public class TaskStepGetResponse implements ISwaggerResponse {
+		public String status;
+	}
+
+	public interface ITaskStepGet extends ISwaggerMethod {
+		public void run(TaskStepGetRequest req, TaskStepGetResponse resp)
+				throws Exception;
+	}
+
+	public class TaskIdxStepPostRequest implements ISwaggerRequest {
+		public String idx;
+	}
+
+	public class TaskIdxStepPostResponse implements ISwaggerResponse {
+		public String status;
+	}
+
+	public interface ITaskIdxStepPost extends ISwaggerMethod {
+		public void run(TaskIdxStepPostRequest req, TaskIdxStepPostResponse resp)
+				throws Exception;
 	}
 
 }

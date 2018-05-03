@@ -101,7 +101,16 @@ public class Search {
 			for (br.jus.trf2.xjus.record.api.IXjusRecordAPI.Field f : r.field) {
 				builder.addField(Field.newBuilder().setName(f.name)
 						.setAtom(f.value));
-				builder.addFacet(Facet.withAtom(f.name, f.value));
+			}
+		}
+
+		if (r.facet != null) {
+			for (br.jus.trf2.xjus.record.api.IXjusRecordAPI.Facet f : r.facet) {
+				if ("FLOAT".equals(f.kind))
+					builder.addFacet(Facet.withNumber(f.name,
+							Double.valueOf(f.value)));
+				else
+					builder.addFacet(Facet.withAtom(f.name, f.value));
 			}
 		}
 		Document doc = builder.build();

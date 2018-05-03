@@ -39,10 +39,10 @@ paths:
 
   /changed-references:
     get:
-      description: Retorna lista de IDs que devem ser indexadas. A lista será ordenada pela data de inclusão ou modificação e, caso seja informado o parâmetro dt, a lista conterá apenas as datas posteriores.
+      description: Retorna lista de IDs que devem ser indexadas. A lista será ordenada pela data de inclusão ou modificação e, caso seja informado o parâmetro dt, a lista conterá apenas as datas posteriores. O valor retornado em last será fornecido na próxima chamada, para dar continuidade à atualização do índice.
       tags: [index]
       parameters:
-        - $ref: "#/parameters/dt"
+        - $ref: "#/parameters/last"
         - $ref: "#/parameters/max"
       responses:
         200:
@@ -54,6 +54,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/Reference"
+              last:
+                $ref: "#/definitions/Last"
         500:
           description: Error ocurred
           schema:
@@ -89,6 +91,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/definitions/Field"
+              facet:
+                type: array
+                items:
+                  $ref: "#/definitions/Facet"
         500:
           description: Error ocurred
           schema:
@@ -101,19 +107,18 @@ parameters:
     description: String que identifica um item, normalmente uma concatenação do tipo do item seguida de ':' e o número do identificar do item formatado com zeros à esquerda.
     required: true
     type: string
-  dt:
-    name: dt
+  last:
+    name: last
     in: path
-    description: String que representa uma data.
+    description: String que deve representar uma data, ou outra maneira qualquer de recuperar o processamento de onde foi parado.
     required: true
     type: string
-    format: date-time
   max:
     name: max
     in: path
     description: Número máximo de IDs que pode ser retornado em uma consulta.
     required: true
-    type: number
+    type: string
 
 definitions:
   Id:
@@ -136,6 +141,10 @@ definitions:
     type: string      
     example: NEVER
     
+  Last:
+    type: string
+    description: Data do registro mais recente que foi informado. A próxima chamada receberá essa data no parâmetro dt.
+    example: documento:000000000123
   Url:
     description: URL que para onde o usuário deve ser direcionado quando clicar no resultado da busca.
     type: string      
@@ -171,6 +180,23 @@ definitions:
     example:
       name: idade
       kind: LONG
+      value: 42
+
+  Facet:
+    type: object
+    properties:
+      name:
+        type: string
+        description: Nome da faceta
+      kind:
+        type: string
+        description: Tipo da faceta, os valores possíveis são KEYWORD, FLOAT.
+      value:
+        type: string
+        description: Valor da faceta
+    example:
+      name: idade
+      kind: FLOAT
       value: 42
 
   Reference:

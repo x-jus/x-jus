@@ -1,6 +1,5 @@
 package br.jus.trf2.xjus.record.api;
 
-import java.util.Date;
 import java.util.List;
 
 import com.crivano.swaggerservlet.ISwaggerMethod;
@@ -21,6 +20,9 @@ public interface IXjusRecordAPI {
 	public class Refresh implements ISwaggerModel {
 	}
 
+	public class Last implements ISwaggerModel {
+	}
+
 	public class Url implements ISwaggerModel {
 	}
 
@@ -39,6 +41,12 @@ public interface IXjusRecordAPI {
 		public String value;
 	}
 
+	public class Facet implements ISwaggerModel {
+		public String name;
+		public String kind;
+		public String value;
+	}
+
 	public class Reference implements ISwaggerModel {
 		public String id;
 	}
@@ -49,7 +57,7 @@ public interface IXjusRecordAPI {
 
 	public class AllReferencesGetRequest implements ISwaggerRequest {
 		public String id;
-		public Double max;
+		public String max;
 	}
 
 	public class AllReferencesGetResponse implements ISwaggerResponse {
@@ -57,22 +65,21 @@ public interface IXjusRecordAPI {
 	}
 
 	public interface IAllReferencesGet extends ISwaggerMethod {
-		public void run(AllReferencesGetRequest req,
-				AllReferencesGetResponse resp) throws Exception;
+		public void run(AllReferencesGetRequest req, AllReferencesGetResponse resp) throws Exception;
 	}
 
 	public class ChangedReferencesGetRequest implements ISwaggerRequest {
-		public Date dt;
-		public Double max;
+		public String last;
+		public String max;
 	}
 
 	public class ChangedReferencesGetResponse implements ISwaggerResponse {
 		public List<Reference> list;
+		public String last;
 	}
 
 	public interface IChangedReferencesGet extends ISwaggerMethod {
-		public void run(ChangedReferencesGetRequest req,
-				ChangedReferencesGetResponse resp) throws Exception;
+		public void run(ChangedReferencesGetRequest req, ChangedReferencesGetResponse resp) throws Exception;
 	}
 
 	public class RecordIdGetRequest implements ISwaggerRequest {
@@ -88,11 +95,11 @@ public interface IXjusRecordAPI {
 		public String title;
 		public String content;
 		public List<Field> field;
+		public List<Facet> facet;
 	}
 
 	public interface IRecordIdGet extends ISwaggerMethod {
-		public void run(RecordIdGetRequest req, RecordIdGetResponse resp)
-				throws Exception;
+		public void run(RecordIdGetRequest req, RecordIdGetResponse resp) throws Exception;
 	}
 
 }

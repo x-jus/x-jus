@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import br.jus.trf2.xjus.Index;
+import br.jus.trf2.xjus.IndexStatus;
 
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.impl.translate.opt.joda.JodaMoneyTranslators;
 import com.googlecode.objectify.impl.translate.opt.joda.JodaTimeTranslators;
 
 public class ObjectifyFactoryCreator {
@@ -28,6 +28,7 @@ public class ObjectifyFactoryCreator {
 		JodaTimeTranslators.add(instance);
 
 		register(Index.class);
+		register(IndexStatus.class);
 	}
 
 	public static ObjectifyFactory getInstance() {

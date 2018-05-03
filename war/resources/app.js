@@ -35,6 +35,7 @@ app.controller('ctrl', function($scope, $http, $location) {
 		$scope.api = $scope.indexes[i].api;
 		$scope.token = $scope.indexes[i].token;
 		$scope.active = $scope.indexes[i].active;
+		$scope.max = $scope.indexes[i].max;
 	}
 
 	$scope.save = function() {
@@ -51,7 +52,8 @@ app.controller('ctrl', function($scope, $http, $location) {
 				descr : $scope.descr,
 				api : $scope.api,
 				token : $scope.token,
-				active : $scope.active
+				active : $scope.active,
+				max : $scope.max
 			}
 		}).then(function(response) {
 			$scope.indexes[i] = response.data.index;
@@ -87,6 +89,7 @@ app.controller('ctrl', function($scope, $http, $location) {
 		$scope.descr = undefined;
 		$scope.api = undefined;
 		$scope.token = undefined;
+		$scope.max = undefined;
 		$scope.active = false;
 	}
 
@@ -95,7 +98,6 @@ app.controller('ctrl', function($scope, $http, $location) {
 			url : '/api/v1/index/' + $scope.indexes[i].idx + "/refresh",
 			method : "POST"
 		}).then(function(response) {
-			$scope.indexes[i] = response.data.index;
 		}, function(response) {
 			$scope.apresentarProblema = true;
 			$scope.msgProblema = response.data.errormsg;

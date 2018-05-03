@@ -1,18 +1,19 @@
 package br.jus.trf2.xjus;
 
+import java.util.Date;
+
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Unindex;
 
 @Entity
 @Unindex
-public class Index {
+public class IndexStatus {
 	@Id
 	public String idx;
 
-	public String descr;
-	public String api;
-	public String token;
-	public Boolean active;
-	public Integer max;
+	public Date lastModified;
+	public String last;
+	public Long records;
+	public Long size;
 }
