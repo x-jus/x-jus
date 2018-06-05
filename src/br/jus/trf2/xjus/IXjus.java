@@ -59,6 +59,9 @@ public interface IXjus {
 	public class MaxRefresh implements ISwaggerModel {
 	}
 
+	public class Secret implements ISwaggerModel {
+	}
+
 	public class Records implements ISwaggerModel {
 	}
 
@@ -88,6 +91,7 @@ public interface IXjus {
 		public Boolean active;
 		public String maxBuild;
 		public String maxRefresh;
+		public String secret;
 		public String records;
 		public String last;
 	}
@@ -139,6 +143,7 @@ public interface IXjus {
 		public Boolean active;
 		public String maxBuild;
 		public String maxRefresh;
+		public String secret;
 	}
 
 	public class IndexIdxPostResponse implements ISwaggerResponse {
@@ -182,6 +187,7 @@ public interface IXjus {
 		public String facets;
 		public String page;
 		public String perpage;
+		public String acl;
 	}
 
 	public class IndexIdxQueryGetResponse implements ISwaggerResponse {

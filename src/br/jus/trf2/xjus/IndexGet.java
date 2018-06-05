@@ -30,7 +30,8 @@ public class IndexGet implements IXjus.IIndexGet {
 				i.maxBuild = idx.maxBuild.toString();
 			if (idx.maxRefresh != null)
 				i.maxRefresh = idx.maxRefresh.toString();
-
+			i.secret = idx.secret;
+			
 			IndexBuildStatus sts = dao.load(Key.create(IndexBuildStatus.class, i.idx));
 			if (sts != null) {
 				i.records = sts.records.toString();

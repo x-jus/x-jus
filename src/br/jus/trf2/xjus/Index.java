@@ -16,4 +16,7 @@ public class Index {
 	public Boolean active;
 	public Integer maxBuild;
 	public Integer maxRefresh;
+
+	// Secret to verify the JWT that authenticates the request
+	public String secret;
 }

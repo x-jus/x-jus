@@ -34,8 +34,11 @@ public class IndexIdxRefreshPost implements IXjus.IIndexIdxRefreshPost {
 		AllReferencesGetResponse allRefs = (AllReferencesGetResponse) SwaggerUtils
 				.fromJson(
 						new String(HttpGAE
-								.fetchAsync(idx.token,
-										new URL(idx.api + "/all-references"),
+								.fetchAsync(
+										idx.token,
+										new URL(idx.api
+												+ "/all-references?max="
+												+ idx.maxBuild),
 										HTTPMethod.GET, null, null).get()
 								.getContent(), StandardCharsets.UTF_8),
 						AllReferencesGetResponse.class);

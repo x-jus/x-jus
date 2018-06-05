@@ -13,7 +13,7 @@ public class AllReferencesGet implements IXjusRecordAPI.IAllReferencesGet {
 			throws Exception {
 		resp.list = new ArrayList<>();
 
-		if (req.id == null) {
+		if (req.lastid == null) {
 			{
 				Reference ref = new Reference();
 				ref.id = "documento:0000000001";
@@ -24,7 +24,7 @@ public class AllReferencesGet implements IXjusRecordAPI.IAllReferencesGet {
 				ref.id = "documento:0000000002";
 				resp.list.add(ref);
 			}
-		} else if ("documento:0000000002".equals(req.id)) {
+		} else if ("documento:0000000002".equals(req.lastid)) {
 			{
 				Reference ref = new Reference();
 				ref.id = "documento:0000000003";

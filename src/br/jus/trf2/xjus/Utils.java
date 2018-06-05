@@ -2,6 +2,9 @@ package br.jus.trf2.xjus;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+import com.auth0.jwt.JWTVerifier;
 
 public class Utils {
 	public static byte[] calcSha1(byte[] content) {
@@ -56,6 +59,16 @@ public class Utils {
 		if (s.trim().length() == 0)
 			return null;
 		return s.trim();
+	}
+
+	public static Map<String, Object> jwtVerify(String token, String secret) {
+		final JWTVerifier verifier = new JWTVerifier(secret);
+		try {
+			Map<String, Object> map = verifier.verify(token);
+			return map;
+		} catch (Exception e) {
+			throw new RuntimeException("Erro ao verificar token JWT", e);
+		}
 	}
 
 }

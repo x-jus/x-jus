@@ -27,6 +27,7 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 			idx.maxBuild = Integer.parseInt(req.maxBuild);
 		if (req.maxRefresh != null)
 			idx.maxRefresh = Integer.parseInt(req.maxRefresh);
+		idx.secret = req.secret;
 		dao.save(idx);
 
 		resp.index = new SearchIndex();
@@ -39,6 +40,7 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 			resp.index.maxBuild = idx.maxBuild.toString();
 		if (idx.maxRefresh != null)
 			resp.index.maxRefresh = idx.maxRefresh.toString();
+		resp.index.secret = idx.secret;
 	}
 
 	public String getContext() {

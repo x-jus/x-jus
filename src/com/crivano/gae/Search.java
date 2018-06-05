@@ -26,10 +26,26 @@ public class Search {
 	}
 
 	public static SearchResults search(String indexName, String filter,
-			String facets, Integer page, Integer perpage) {
+			String facets, Integer page, Integer perpage, String acl) {
 		IndexSpec indexSpec = IndexSpec.newBuilder().setName(indexName).build();
 		com.google.appengine.api.search.Index index = SearchServiceFactory
 				.getSearchService().getIndex(indexSpec);
+
+		if (acl == null)
+			acl = "PUBLIC";
+
+		String filterWithACL = filter.trim();
+		if (filterWithACL.length() > 0)
+			filterWithACL = "(" + filterWithACL + ") AND ";
+		filterWithACL += "(";
+		String[] split = acl.split(";");
+		for (int i = 0; i < split.length; i++) {
+			if (i > 0)
+				filterWithACL += " OR ";
+			filterWithACL += "acl:" + split[i];
+		}
+		filterWithACL += ")";
+		System.out.println(filterWithACL);
 
 		int offset = 0;
 		if (page != null && perpage != null) {
@@ -47,7 +63,7 @@ public class Search {
 				queryBuilder.addFacetRefinementFromToken(f);
 		}
 		Results<ScoredDocument> result = index.search(queryBuilder
-				.build(filter));
+				.build(filterWithACL));
 		SearchResults r = new SearchResults();
 		r.result = result;
 		return r;
@@ -96,6 +112,12 @@ public class Search {
 		if (r.title != null)
 			builder.addField(Field.newBuilder().setName("title")
 					.setText(r.title));
+
+		if (r.acl != null) {
+			String[] split = r.acl.split(";");
+			for (String s : split)
+				builder.addField(Field.newBuilder().setName("acl").setAtom(s));
+		}
 
 		if (r.field != null) {
 			for (br.jus.trf2.xjus.record.api.IXjusRecordAPI.Field f : r.field) {

@@ -52,6 +52,7 @@ paths:
         - $ref: "#/parameters/active"
         - $ref: "#/parameters/maxBuild"
         - $ref: "#/parameters/maxRefresh"
+        - $ref: "#/parameters/secret"
       responses:
         200:
           description: Successful response
@@ -112,6 +113,7 @@ paths:
         - $ref: "#/parameters/facets"
         - $ref: "#/parameters/page"
         - $ref: "#/parameters/perpage"
+        - $ref: "#/parameters/acl"
       responses:
         200:
           description: Successful response
@@ -310,6 +312,12 @@ parameters:
     description: Quantidade de itens por página.
     required: true
     type: string
+  acl:
+    name: acl
+    in: query
+    description: Perfis que devem ser incluídos na busca, separados por ponto e vírgula. Se não for informado, será utilizado PUBLIC ou a ACL do Authorization header, se for um JWT válido.
+    required: false
+    type: string
   id:
     name: id
     in: path
@@ -376,6 +384,12 @@ parameters:
     in: formData
     description: Número máximo de IDs que pode ser retornado em uma consulta. Considerando que a cada minuto a aplicação verifica se existem novos itens a serem acrescidos ao índice, esse número também reflete a velocidade que o índice é revisado, em itens a cada 10 minutos.
     required: true
+    type: string
+  secret:
+    name: secret
+    in: formData
+    description: Segredo para validar a autenticação JWT e proteger o índice de acessos indevidos.
+    required: false
     type: string
 
 definitions:
@@ -457,6 +471,10 @@ definitions:
     description: Quantidade de registros que podem ser recuperado de uma só vez na Record API para all-references
     type: string
     example: 50
+  Secret:
+    description: Segredo que protege a autenticação e as ACLs
+    type: string
+    example: 50
   Records:
     description: Quantidade de registros no índice
     type: string      
@@ -514,6 +532,8 @@ definitions:
         $ref: "#/definitions/MaxBuild"
       maxRefresh:
         $ref: "#/definitions/MaxRefresh"
+      secret:
+        $ref: "#/definitions/Secret"
       records:
         $ref: "#/definitions/Records"
       last:

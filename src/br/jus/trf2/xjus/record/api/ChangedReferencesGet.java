@@ -13,7 +13,7 @@ public class ChangedReferencesGet implements
 	public void run(ChangedReferencesGetRequest req,
 			ChangedReferencesGetResponse resp) throws Exception {
 		resp.list = new ArrayList<>();
-		if (req.last == null) {
+		if (req.lastdate == null) {
 			{
 				Reference ref = new Reference();
 				ref.id = "documento:0000000001";
@@ -25,7 +25,7 @@ public class ChangedReferencesGet implements
 				resp.list.add(ref);
 			}
 			resp.last = "2";
-		} else if (req.last.equals("2")) {
+		} else if (req.lastdate.equals("2")) {
 			{
 				Reference ref = new Reference();
 				ref.id = "documento:0000000003";
