@@ -77,7 +77,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 										null).get().getContent(),
 								StandardCharsets.UTF_8),
 						ChangedReferencesGetResponse.class);
-		if (changedRefs.list == null || changedRefs.last == null)
+		if (changedRefs.list == null || changedRefs.list.size() == 0)
 			return;
 
 		// Add tasks to refresh each ID
@@ -100,8 +100,8 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 			sts.records = 0L;
 		}
 		sts.lastModified = new Date();
-		if (changedRefs.last != null)
-			sts.last = changedRefs.last;
+		Reference last = changedRefs.list.get(changedRefs.list.size() - 1);
+		sts.last = last.date + ";" + last.id;
 		sts.records += changedRefs.list.size();
 		dao.save(sts);
 	}

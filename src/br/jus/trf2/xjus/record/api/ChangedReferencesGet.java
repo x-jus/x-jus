@@ -13,30 +13,32 @@ public class ChangedReferencesGet implements
 	public void run(ChangedReferencesGetRequest req,
 			ChangedReferencesGetResponse resp) throws Exception {
 		resp.list = new ArrayList<>();
-		if (req.lastdate == null) {
+		if (req.last == null) {
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000001";
+				ref.id = "0000000001";
+				ref.date = "2018-01-01";
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000002";
+				ref.id = "0000000002";
+				ref.date = "2018-01-02";
 				resp.list.add(ref);
 			}
-			resp.last = "2";
-		} else if (req.lastdate.equals("2")) {
+		} else if (req.last.equals("2018-01-02;0000000002")) {
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000003";
+				ref.id = "0000000003";
+				ref.date = "2018-01-03";
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000004";
+				ref.id = "0000000004";
+				ref.date = "2018-01-04";
 				resp.list.add(ref);
 			}
-			resp.last = "4";
 		}
 	}
 

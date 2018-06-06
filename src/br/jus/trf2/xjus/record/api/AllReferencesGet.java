@@ -13,26 +13,26 @@ public class AllReferencesGet implements IXjusRecordAPI.IAllReferencesGet {
 			throws Exception {
 		resp.list = new ArrayList<>();
 
-		if (req.lastid == null) {
+		if (req.last == null) {
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000001";
+				ref.id = "0000000001";
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000002";
+				ref.id = "0000000002";
 				resp.list.add(ref);
 			}
-		} else if ("documento:0000000002".equals(req.lastid)) {
+		} else if ("0000000002".equals(req.last)) {
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000003";
+				ref.id = "0000000003";
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
-				ref.id = "documento:0000000004";
+				ref.id = "0000000004";
 				resp.list.add(ref);
 			}
 		}
