@@ -5,11 +5,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
+import br.jus.trf2.xjus.model.Index;
+import br.jus.trf2.xjus.model.IndexRefreshStatus;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
@@ -73,7 +74,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 				+ (idx.maxRefresh == null ? MAX_PER_MINUTE_DEFAULT
 						: idx.maxRefresh);
 		if (sts != null && sts.id != null)
-			qs += "&id=" + sts.id;
+			qs += "&lastid=" + sts.id;
 		AllReferencesGetResponse changedRefs = (AllReferencesGetResponse) SwaggerUtils
 				.fromJson(
 						new String(HttpGAE
@@ -151,6 +152,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 		sts.lastModified = new Date();
 		if (lastId != null)
 			sts.id = lastId;
+		sts.complete = setNovo.size() == 0 && setAntigo.size() == 0;
 		dao.save(sts);
 	}
 

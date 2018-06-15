@@ -6,6 +6,8 @@ import java.util.Date;
 
 import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostResponse;
+import br.jus.trf2.xjus.model.Index;
+import br.jus.trf2.xjus.model.IndexBuildStatus;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
@@ -65,19 +67,20 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 		// Query changed IDs since last update
 		String qs = "?max="
 				+ (idx.maxBuild == null ? MAX_PER_MINUTE_DEFAULT : idx.maxBuild);
-		if (sts != null && sts.last != null)
-			qs += "&last=" + sts.last;
+		if (sts != null && sts.lastdate != null)
+			qs += "&lastdate=" + SwaggerUtils.format(sts.lastdate);
+		if (sts != null && sts.lastid != null)
+			qs += "&lastid=" + sts.lastid;
+		URL url = new URL(idx.api + "/changed-references" + qs);
+		System.out.println(url.toString());
 		ChangedReferencesGetResponse changedRefs = (ChangedReferencesGetResponse) SwaggerUtils
 				.fromJson(
 						new String(HttpGAE
-								.fetchAsync(
-										idx.token,
-										new URL(idx.api + "/changed-references"
-												+ qs), HTTPMethod.GET, null,
-										null).get().getContent(),
+								.fetchAsync(idx.token, url, HTTPMethod.GET,
+										null, null).get().getContent(),
 								StandardCharsets.UTF_8),
 						ChangedReferencesGetResponse.class);
-		if (changedRefs.list == null || changedRefs.list.size() == 0)
+		if (changedRefs.list == null)
 			return;
 
 		// Add tasks to refresh each ID
@@ -100,9 +103,13 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 			sts.records = 0L;
 		}
 		sts.lastModified = new Date();
-		Reference last = changedRefs.list.get(changedRefs.list.size() - 1);
-		sts.last = last.date + ";" + last.id;
-		sts.records += changedRefs.list.size();
+		if (changedRefs.list.size() > 0) {
+			Reference last = changedRefs.list.get(changedRefs.list.size() - 1);
+			sts.lastdate = last.date;
+			sts.lastid = last.id;
+		}
+		sts.lastCount = changedRefs.list.size();
+		sts.records += sts.lastCount;
 		dao.save(sts);
 	}
 

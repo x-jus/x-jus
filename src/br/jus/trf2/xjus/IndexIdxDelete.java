@@ -3,6 +3,7 @@ package br.jus.trf2.xjus;
 import br.jus.trf2.xjus.IXjus.IndexIdxDeleteRequest;
 import br.jus.trf2.xjus.IXjus.IndexIdxDeleteResponse;
 import br.jus.trf2.xjus.IXjus.SearchIndex;
+import br.jus.trf2.xjus.model.Index;
 
 import com.crivano.gae.Dao;
 import com.googlecode.objectify.Key;

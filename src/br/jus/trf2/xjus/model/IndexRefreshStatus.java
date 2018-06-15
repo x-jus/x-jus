@@ -1,4 +1,4 @@
-package br.jus.trf2.xjus;
+package br.jus.trf2.xjus.model;
 
 import java.util.Date;
 
@@ -8,11 +8,12 @@ import com.googlecode.objectify.annotation.Unindex;
 
 @Entity
 @Unindex
-public class IndexStatus {
+public class IndexRefreshStatus {
 	@Id
 	public String idx;
 
 	public Date lastModified;
-	public Long records;
-	public Long size;
+	public String id;
+
+	public boolean complete;
 }

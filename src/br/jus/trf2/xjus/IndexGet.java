@@ -3,12 +3,16 @@ package br.jus.trf2.xjus;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.crivano.gae.Dao;
-import com.googlecode.objectify.Key;
-
 import br.jus.trf2.xjus.IXjus.IndexGetRequest;
 import br.jus.trf2.xjus.IXjus.IndexGetResponse;
 import br.jus.trf2.xjus.IXjus.SearchIndex;
+import br.jus.trf2.xjus.model.Index;
+import br.jus.trf2.xjus.model.IndexBuildStatus;
+import br.jus.trf2.xjus.model.IndexRefreshStatus;
+import br.jus.trf2.xjus.model.IndexStatus;
+
+import com.crivano.gae.Dao;
+import com.googlecode.objectify.Key;
 
 public class IndexGet implements IXjus.IIndexGet {
 
@@ -31,11 +35,26 @@ public class IndexGet implements IXjus.IIndexGet {
 			if (idx.maxRefresh != null)
 				i.maxRefresh = idx.maxRefresh.toString();
 			i.secret = idx.secret;
-			
-			IndexBuildStatus sts = dao.load(Key.create(IndexBuildStatus.class, i.idx));
+
+			IndexStatus sts = dao.load(Key.create(IndexStatus.class, i.idx));
 			if (sts != null) {
 				i.records = sts.records.toString();
-				i.last = sts.last;
+			}
+			IndexBuildStatus stsBuild = dao.load(Key.create(
+					IndexBuildStatus.class, i.idx));
+			if (stsBuild != null) {
+				i.buildRecords = stsBuild.records.toString();
+				i.buildLastDate = stsBuild.lastdate;
+				i.buildLastId = stsBuild.lastid;
+				if (stsBuild.lastCount != null)
+					i.buildLastCount = stsBuild.lastCount.toString();
+			}
+			IndexRefreshStatus stsRefresh = dao.load(Key.create(
+					IndexRefreshStatus.class, i.idx));
+			if (stsRefresh != null) {
+				i.refreshComplete = stsRefresh.complete;
+				i.refreshLastId = stsRefresh.id;
+				i.refreshTimestamp = stsRefresh.lastModified;
 			}
 			resp.list.add(i);
 		}

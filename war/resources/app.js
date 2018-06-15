@@ -104,6 +104,9 @@ app.controller('ctrl', function($scope, $http, $location) {
 			url : '/api/v1/index/' + $scope.indexes[i].idx + "/refresh",
 			method : "POST"
 		}).then(function(response) {
+			delete $scope.indexes[i].refreshTimestamp;
+			delete $scope.indexes[i].refreshLastId;
+			delete $scope.indexes[i].refreshComplete;
 		}, function(response) {
 			$scope.apresentarProblema = true;
 			$scope.msgProblema = response.data.errormsg;

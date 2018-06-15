@@ -1,4 +1,4 @@
-package br.jus.trf2.xjus;
+package br.jus.trf2.xjus.model;
 
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;

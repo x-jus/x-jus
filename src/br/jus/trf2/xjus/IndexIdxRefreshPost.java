@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import br.jus.trf2.xjus.IXjus.IndexIdxRefreshPostRequest;
 import br.jus.trf2.xjus.IXjus.IndexIdxRefreshPostResponse;
+import br.jus.trf2.xjus.model.Index;
+import br.jus.trf2.xjus.model.IndexRefreshStatus;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
@@ -25,9 +27,19 @@ public class IndexIdxRefreshPost implements IXjus.IIndexIdxRefreshPost {
 	@Override
 	public void run(IndexIdxRefreshPostRequest req,
 			IndexIdxRefreshPostResponse resp) throws Exception {
+		Dao dao = new Dao();
+
+		IndexRefreshStatus sts = new IndexRefreshStatus();
+		sts.idx = req.idx;
+		dao.del(sts);
+		System.out
+				.println("removendo refresh-status para forçar a reindexação de "
+						+ req.idx);
+		if (false)
+			return;
+
 		System.out.println("refrescando índice " + req.idx);
 
-		Dao dao = new Dao();
 		Key<Index> key = Key.create(Index.class, req.idx);
 		Index idx = dao.load(key);
 

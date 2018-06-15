@@ -1,5 +1,6 @@
 package br.jus.trf2.xjus.record.api;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetRequest;
@@ -13,30 +14,30 @@ public class ChangedReferencesGet implements
 	public void run(ChangedReferencesGetRequest req,
 			ChangedReferencesGetResponse resp) throws Exception {
 		resp.list = new ArrayList<>();
-		if (req.last == null) {
+		if (req.lastdate == null) {
 			{
 				Reference ref = new Reference();
 				ref.id = "0000000001";
-				ref.date = "2018-01-01";
+				ref.date = Date.valueOf("2018-01-01");
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
 				ref.id = "0000000002";
-				ref.date = "2018-01-02";
+				ref.date = Date.valueOf("2018-01-02");
 				resp.list.add(ref);
 			}
-		} else if (req.last.equals("2018-01-02;0000000002")) {
+		} else if (req.lastdate.equals(Date.valueOf("2018-01-02"))) {
 			{
 				Reference ref = new Reference();
 				ref.id = "0000000003";
-				ref.date = "2018-01-03";
+				ref.date = Date.valueOf("2018-01-03");
 				resp.list.add(ref);
 			}
 			{
 				Reference ref = new Reference();
 				ref.id = "0000000004";
-				ref.date = "2018-01-04";
+				ref.date = Date.valueOf("2018-01-04");
 				resp.list.add(ref);
 			}
 		}

@@ -31,9 +31,4 @@ public class XjusMockRecordServlet extends SwaggerServlet {
 		super.doPost(req, resp);
 	}
 
-	@Override
-	public String getService() {
-		return "mock record api";
-	}
-
 }

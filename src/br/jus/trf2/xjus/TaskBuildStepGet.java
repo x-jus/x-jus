@@ -4,6 +4,7 @@ import java.util.List;
 
 import br.jus.trf2.xjus.IXjus.TaskBuildStepGetRequest;
 import br.jus.trf2.xjus.IXjus.TaskBuildStepGetResponse;
+import br.jus.trf2.xjus.model.Index;
 
 import com.crivano.gae.Dao;
 import com.google.appengine.api.modules.ModulesServiceFactory;

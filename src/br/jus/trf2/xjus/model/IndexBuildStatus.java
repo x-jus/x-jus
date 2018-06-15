@@ -1,4 +1,4 @@
-package br.jus.trf2.xjus;
+package br.jus.trf2.xjus.model;
 
 import java.util.Date;
 
@@ -13,7 +13,9 @@ public class IndexBuildStatus {
 	public String idx;
 
 	public Date lastModified;
-	public String last;
+	public Date lastdate;
+	public String lastid;
 	public Long records;
 	public Long size;
+	public Integer lastCount;
 }

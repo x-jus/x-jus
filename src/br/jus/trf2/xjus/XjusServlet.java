@@ -34,9 +34,4 @@ public class XjusServlet extends SwaggerServlet {
 		super.doPost(req, resp);
 	}
 
-	@Override
-	public String getService() {
-		return "xjus";
-	}
-
 }

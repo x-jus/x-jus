@@ -3,10 +3,10 @@ package com.crivano.gae;
 import java.util.HashSet;
 import java.util.Set;
 
-import br.jus.trf2.xjus.Index;
-import br.jus.trf2.xjus.IndexBuildStatus;
-import br.jus.trf2.xjus.IndexRefreshStatus;
-import br.jus.trf2.xjus.IndexStatus;
+import br.jus.trf2.xjus.model.Index;
+import br.jus.trf2.xjus.model.IndexBuildStatus;
+import br.jus.trf2.xjus.model.IndexRefreshStatus;
+import br.jus.trf2.xjus.model.IndexStatus;
 
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;

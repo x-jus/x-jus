@@ -479,9 +479,19 @@ definitions:
     description: Quantidade de registros no índice
     type: string      
     example: 1234
-  Last:
-    description: Última data (ou localizador) que foi submetido à Record API
+  LastDate:
+    description: Última data que foi submetido à Record API
     type: string      
+    format: date-time      
+    example: 2018-05-02T01:02:03.456-02:00
+  LastId:
+    description: Última ID que foi indexada
+    type: string      
+    example: 0000001
+  Timestamp:
+    description: Data e hora da última indexação
+    type: string
+    format: date-time
     example: 2018-05-02T01:02:03.456-02:00
   Status:
     description: Identificador do status índice
@@ -492,6 +502,11 @@ definitions:
     description: Contador
     type: number
     example: 123
+    
+  Complete:
+    description: Indica se o processo foi concluído
+    type: boolean
+    example: false
     
   RefinementToken:
     description: Identificador da faceta para restringir a busca
@@ -536,9 +551,20 @@ definitions:
         $ref: "#/definitions/Secret"
       records:
         $ref: "#/definitions/Records"
-      last:
-        $ref: "#/definitions/Last"
-
+      buildRecords:
+        $ref: "#/definitions/Records"
+      buildLastCount:
+        $ref: "#/definitions/Records"
+      buildLastDate:
+        $ref: "#/definitions/LastDate"
+      buildLastId:
+        $ref: "#/definitions/LastId"
+      refreshLastId:
+        $ref: "#/definitions/LastId"
+      refreshTimestamp:
+        $ref: "#/definitions/Timestamp"
+      refreshComplete:
+        $ref: "#/definitions/Complete"
   Facet:
     type: object
     properties:

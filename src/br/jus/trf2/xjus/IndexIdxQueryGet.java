@@ -10,6 +10,7 @@ import br.jus.trf2.xjus.IXjus.FacetValue;
 import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetRequest;
 import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.IXjus.Record;
+import br.jus.trf2.xjus.model.Index;
 
 import com.crivano.gae.Dao;
 import com.crivano.gae.Search;

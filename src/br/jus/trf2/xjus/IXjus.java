@@ -1,5 +1,6 @@
 package br.jus.trf2.xjus;
 
+import java.util.Date;
 import java.util.List;
 
 import com.crivano.swaggerservlet.ISwaggerMethod;
@@ -65,13 +66,22 @@ public interface IXjus {
 	public class Records implements ISwaggerModel {
 	}
 
-	public class Last implements ISwaggerModel {
+	public class LastDate implements ISwaggerModel {
+	}
+
+	public class LastId implements ISwaggerModel {
+	}
+
+	public class Timestamp implements ISwaggerModel {
 	}
 
 	public class Status implements ISwaggerModel {
 	}
 
 	public class Count implements ISwaggerModel {
+	}
+
+	public class Complete implements ISwaggerModel {
 	}
 
 	public class RefinementToken implements ISwaggerModel {
@@ -93,7 +103,13 @@ public interface IXjus {
 		public String maxRefresh;
 		public String secret;
 		public String records;
-		public String last;
+		public String buildRecords;
+		public String buildLastCount;
+		public Date buildLastDate;
+		public String buildLastId;
+		public String refreshLastId;
+		public Date refreshTimestamp;
+		public Boolean refreshComplete;
 	}
 
 	public class Facet implements ISwaggerModel {

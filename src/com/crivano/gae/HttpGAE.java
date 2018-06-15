@@ -87,8 +87,7 @@ public class HttpGAE implements IHTTP {
 		com.google.appengine.api.urlfetch.FetchOptions lFetchOptions = com.google.appengine.api.urlfetch.FetchOptions.Builder
 				.doNotValidateCertificate().setDeadline(60.0);
 		HTTPRequest request = new HTTPRequest(url, method, lFetchOptions);
-		request.setHeader(new HTTPHeader("User-Agent", "SwaggerServlet"));
-
+		request.setHeader(new HTTPHeader("User-Agent", "SwaggerServletGAE"));
 		if (authorization != null)
 			request.setHeader(new HTTPHeader("Authorization", authorization));
 		if (contentType != null)
