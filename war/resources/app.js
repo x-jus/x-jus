@@ -15,15 +15,25 @@ app.config(function($routeProvider, $locationProvider) {
 	$locationProvider.html5Mode(false);
 });
 
-app.controller('ctrlRouter', function($scope) {
+app.controller('ctrlRouter', function($scope, $http) {
 	$scope.promise = null;
+	$scope.promise = $http({
+		url : '/api/v1/user',
+		method : "GET"
+	}).then(function(response) {
+		$scope.user = response.data.user;
+	}, function(response) {
+		$scope.apresentarProblema = true;
+		$scope.msgProblema = response.data.errormsg;
+	});
+
 });
 
 app.controller('ctrl', function($scope, $http, $location) {
 	$scope.editing = undefined;
 
 	$scope.indexes = [];
-
+	
 	$scope.status = function(i) {
 		return $scope.indexes[i].active ? "Ativo" : "Inativo";
 	}

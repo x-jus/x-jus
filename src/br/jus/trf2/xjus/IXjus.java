@@ -135,8 +135,27 @@ public interface IXjus {
 		public List<Field> field;
 	}
 
+	public class User implements ISwaggerModel {
+		public String gmail;
+		public Boolean admin;
+		public String loginUrl;
+		public String logoutUrl;
+	}
+
 	public class Error implements ISwaggerModel {
 		public String errormsg;
+	}
+
+	public class UserGetRequest implements ISwaggerRequest {
+	}
+
+	public class UserGetResponse implements ISwaggerResponse {
+		public User user;
+	}
+
+	public interface IUserGet extends ISwaggerMethod {
+		public void run(UserGetRequest req, UserGetResponse resp)
+				throws Exception;
 	}
 
 	public class IndexGetRequest implements ISwaggerRequest {
@@ -252,22 +271,6 @@ public interface IXjus {
 				IndexIdxRecordPostResponse resp) throws Exception;
 	}
 
-	public class IndexIdxRecordIdRefreshPostRequest implements ISwaggerRequest {
-		public String idx;
-		public String id;
-		public Boolean sync;
-	}
-
-	public class IndexIdxRecordIdRefreshPostResponse implements
-			ISwaggerResponse {
-		public String id;
-	}
-
-	public interface IIndexIdxRecordIdRefreshPost extends ISwaggerMethod {
-		public void run(IndexIdxRecordIdRefreshPostRequest req,
-				IndexIdxRecordIdRefreshPostResponse resp) throws Exception;
-	}
-
 	public class TaskBuildStepGetRequest implements ISwaggerRequest {
 	}
 
@@ -316,6 +319,21 @@ public interface IXjus {
 	public interface ITaskIdxRefreshStepPost extends ISwaggerMethod {
 		public void run(TaskIdxRefreshStepPostRequest req,
 				TaskIdxRefreshStepPostResponse resp) throws Exception;
+	}
+
+	public class TaskIdxRecordIdRefreshPostRequest implements ISwaggerRequest {
+		public String idx;
+		public String id;
+		public Boolean sync;
+	}
+
+	public class TaskIdxRecordIdRefreshPostResponse implements ISwaggerResponse {
+		public String id;
+	}
+
+	public interface ITaskIdxRecordIdRefreshPost extends ISwaggerMethod {
+		public void run(TaskIdxRecordIdRefreshPostRequest req,
+				TaskIdxRecordIdRefreshPostResponse resp) throws Exception;
 	}
 
 }

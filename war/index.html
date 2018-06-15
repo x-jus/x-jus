@@ -24,7 +24,36 @@
 </head>
 <body ng-app="app" ng-controller="ctrlRouter">
 	<div class="container-fluid">
-		<h1>X-jus</h1>
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
+			<a class="navbar-brand" href="#">X-jus</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse"
+				data-target="#navbarSupportedContent"
+				aria-controls="navbarSupportedContent" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item active"><a class="nav-link" href="#">Painel
+							de Administração</a></li>
+				</ul>
+				<span class="navbar-text" ng-if="user.gmail">{{user.gmail}} -
+					<a href="{{user.logoutUrl}}">logout</a>
+				</span> <span class="navbar-text" ng-if="!user.gmail"> <a
+					href="{{user.loginUrl}}">login</a>
+				</span>
+			</div>
+		</nav>
+
+		<div ng-if="!user.gmail">
+			<p class="alert alert-danger mt-3">Antes de acessar o painel é
+				necessário fazer o login.</p>
+		</div>
+		<div ng-if="user.gmail &amp;&amp; !user.admin">
+			<p class="alert alert-danger mt-3">O usuário precisa ser
+				administrador para acessar o painel.</p>
+		</div>
 
 		<div ng-view></div>
 

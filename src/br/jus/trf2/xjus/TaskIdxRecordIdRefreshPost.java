@@ -3,8 +3,8 @@ package br.jus.trf2.xjus;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import br.jus.trf2.xjus.IXjus.IndexIdxRecordIdRefreshPostRequest;
-import br.jus.trf2.xjus.IXjus.IndexIdxRecordIdRefreshPostResponse;
+import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostRequest;
+import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 
@@ -16,11 +16,11 @@ import com.google.appengine.api.search.Document;
 import com.google.appengine.api.urlfetch.HTTPMethod;
 import com.googlecode.objectify.Key;
 
-public class IndexIdxRecordIdRefreshPost implements
-		IXjus.IIndexIdxRecordIdRefreshPost {
+public class TaskIdxRecordIdRefreshPost implements
+		IXjus.ITaskIdxRecordIdRefreshPost {
 	@Override
-	public void run(IndexIdxRecordIdRefreshPostRequest req,
-			IndexIdxRecordIdRefreshPostResponse resp) throws Exception {
+	public void run(TaskIdxRecordIdRefreshPostRequest req,
+			TaskIdxRecordIdRefreshPostResponse resp) throws Exception {
 		System.out.println("índice " + req.idx + " - registro " + req.id
 				+ " - buscando");
 

@@ -13,6 +13,8 @@ public class IndexIdxDelete implements IXjus.IIndexIdxDelete {
 	@Override
 	public void run(IndexIdxDeleteRequest req, IndexIdxDeleteResponse resp)
 			throws Exception {
+		Utils.assertUserCorrente();
+
 		Dao dao = new Dao();
 		Key<Index> key = Key.create(Index.class, req.idx);
 		dao.del(key);

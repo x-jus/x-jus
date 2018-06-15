@@ -87,7 +87,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 		for (Reference ref : changedRefs.list) {
 			queue.addAsync(TaskOptions.Builder
 					.withUrl(
-							"/api/v1/index/" + req.idx + "/record/" + ref.id
+							"/api/v1/task/" + req.idx + "/record/" + ref.id
 									+ "/refresh")
 					.method(Method.POST)
 					.retryOptions(RETRY_OPTIONS)

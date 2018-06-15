@@ -27,6 +27,8 @@ public class IndexIdxRefreshPost implements IXjus.IIndexIdxRefreshPost {
 	@Override
 	public void run(IndexIdxRefreshPostRequest req,
 			IndexIdxRefreshPostResponse resp) throws Exception {
+		Utils.assertUserCorrente();
+
 		Dao dao = new Dao();
 
 		IndexRefreshStatus sts = new IndexRefreshStatus();

@@ -13,6 +13,8 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 	@Override
 	public void run(IndexIdxPostRequest req, IndexIdxPostResponse resp)
 			throws Exception {
+		Utils.assertUserCorrente();
+
 		Dao dao = new Dao();
 		Key<Index> key = Key.create(Index.class, req.idx);
 		Index idx = dao.load(key);

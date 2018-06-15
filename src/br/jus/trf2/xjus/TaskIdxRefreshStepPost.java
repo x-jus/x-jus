@@ -178,7 +178,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 	protected void addRefreshTask(Queue queue, String indexName, String id) {
 		queue.addAsync(TaskOptions.Builder
 				.withUrl(
-						"/api/v1/index/" + indexName + "/record/" + id
+						"/api/v1/task/" + indexName + "/record/" + id
 								+ "/refresh")
 				.method(Method.POST)
 				.retryOptions(RETRY_OPTIONS)

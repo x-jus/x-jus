@@ -19,6 +19,8 @@ public class IndexGet implements IXjus.IIndexGet {
 	@Override
 	public void run(IndexGetRequest req, IndexGetResponse resp)
 			throws Exception {
+		Utils.assertUserCorrente();
+		
 		resp.list = new ArrayList<>();
 
 		Dao dao = new Dao();

@@ -21,6 +21,23 @@ tags:
     description: Automação da montagem dos índices
 
 paths:
+  /user:
+    get:
+      description: Indica se o usuário está autenticado ou não e se é administrador
+      tags: [dashboard]
+      parameters: []
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              user:
+                $ref: "#/definitions/User"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
   /index:
     get:
       description: Retorna lista de índices cadastrados.
@@ -192,27 +209,6 @@ paths:
           schema:
             $ref: "#/definitions/Error"
             
-  /index/{idx}/record/{id}/refresh:
-    post:
-      description: Força a recarga de um item, ou indica que um novo item deve ser indexado
-      tags: [index]
-      parameters:
-        - $ref: "#/parameters/idx"
-        - $ref: "#/parameters/id"
-        - $ref: "#/parameters/sync"
-      responses:
-        200:
-          description: Successful response
-          schema:
-            type: object
-            properties:
-              id:
-                $ref: "#/definitions/Id"
-        500:
-          description: Error ocurred
-          schema:
-            $ref: "#/definitions/Error"
-
   /task/build-step:
     get:
       description: Cria um task de build para cada um dos índices ativos
@@ -282,6 +278,27 @@ paths:
             properties:
               status:
                 $ref: "#/definitions/Status"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
+
+  /task/{idx}/record/{id}/refresh:
+    post:
+      description: Força a recarga de um item, ou indica que um novo item deve ser indexado
+      tags: [task]
+      parameters:
+        - $ref: "#/parameters/idx"
+        - $ref: "#/parameters/id"
+        - $ref: "#/parameters/sync"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: "#/definitions/Id"
         500:
           description: Error ocurred
           schema:
@@ -608,6 +625,27 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/Field"
+
+  User:
+    type: object
+    properties:
+      gmail:
+        type: string
+        description: Email do usuário logado na forma usr@gmail.com
+      admin:
+        type: boolean
+        description: Indica se o usuário é administrador
+      loginUrl:
+        type: string
+        description: URL que deve ser utilizada para fazer o login
+      logoutUrl:
+        type: string
+        description: URL que deve ser utilizada para fazer o login
+    example:
+      gmail: usr@gmail.com
+      admin: false
+      loginUrl: https://google.com/login
+      logoutUrl: https://google.com/logout
 
   Error:
     type: object

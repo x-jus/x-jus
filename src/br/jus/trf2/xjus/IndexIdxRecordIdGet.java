@@ -8,7 +8,7 @@ public class IndexIdxRecordIdGet implements IXjus.IIndexIdxRecordIdGet {
 	@Override
 	public void run(IndexIdxRecordIdGetRequest req,
 			IndexIdxRecordIdGetResponse resp) throws Exception {
-		// TODO Auto-generated method stub
+		Utils.assertUserCorrente();
 
 	}
 
