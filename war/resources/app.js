@@ -33,42 +33,35 @@ app.controller('ctrl', function($scope, $http, $location) {
 	$scope.editing = undefined;
 
 	$scope.indexes = [];
-	
+
 	$scope.status = function(i) {
 		return $scope.indexes[i].active ? "Ativo" : "Inativo";
 	}
 
 	$scope.edit = function(i) {
 		$scope.editing = i;
-		$scope.idx = $scope.indexes[i].idx;
-		$scope.descr = $scope.indexes[i].descr;
-		$scope.api = $scope.indexes[i].api;
-		$scope.token = $scope.indexes[i].token;
-		$scope.active = $scope.indexes[i].active;
-		$scope.maxBuild = $scope.indexes[i].maxBuild;
-		$scope.maxRefresh = $scope.indexes[i].maxRefresh;
-		$scope.secret = $scope.indexes[i].secret;
+		$scope.record = {
+			idx : $scope.indexes[i].idx,
+			descr : $scope.indexes[i].descr,
+			api : $scope.indexes[i].api,
+			token : $scope.indexes[i].token,
+			active : $scope.indexes[i].active,
+			maxBuild : $scope.indexes[i].maxBuild,
+			maxRefresh : $scope.indexes[i].maxRefresh,
+			secret : $scope.indexes[i].secret
+		}
 	}
 
 	$scope.save = function() {
 		var i = $scope.editing;
 		if (i === -1) {
-			$scope.indexes.push({});
+			$scope.indexes.push($scope.record);
 			i = $scope.indexes.length - 1;
 		}
 		$scope.promise = $http({
-			url : '/api/v1/index/' + $scope.idx,
+			url : '/api/v1/index/' + $scope.record.idx,
 			method : "POST",
-			data : {
-				idx : $scope.idx,
-				descr : $scope.descr,
-				api : $scope.api,
-				token : $scope.token,
-				active : $scope.active,
-				maxBuild : $scope.maxBuild,
-				maxRefresh : $scope.maxRefresh,
-				secret : $scope.secret
-			}
+			data : $scope.record
 		}).then(function(response) {
 			$scope.indexes[i] = response.data.index;
 			$scope.editing = undefined;
@@ -76,11 +69,6 @@ app.controller('ctrl', function($scope, $http, $location) {
 			$scope.apresentarProblema = true;
 			$scope.msgProblema = response.data.errormsg;
 		});
-		// $scope.indexes[i].idx = $scope.idx;
-		// $scope.indexes[i].descr = $scope.descr;
-		// $scope.indexes[i].api = $scope.api;
-		// $scope.indexes[i].token = $scope.token;
-		// $scope.indexes[i].active = $scope.active;
 	}
 
 	$scope.remove = function() {
@@ -99,14 +87,7 @@ app.controller('ctrl', function($scope, $http, $location) {
 
 	$scope.create = function(i) {
 		$scope.editing = -1;
-		$scope.idx = undefined;
-		$scope.descr = undefined;
-		$scope.api = undefined;
-		$scope.token = undefined;
-		$scope.maxBuild = undefined;
-		$scope.maxRefresh = undefined;
-		$scope.secret = undefined;
-		$scope.active = false;
+		$scope.record = {};
 	}
 
 	$scope.refresh = function(i) {
