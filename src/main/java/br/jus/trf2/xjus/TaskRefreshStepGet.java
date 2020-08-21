@@ -18,9 +18,9 @@ public class TaskRefreshStepGet implements IXjus.ITaskRefreshStepGet {
 
 		System.out.println("revisando índices");
 
-		ITask queue = new GaeTaskImpl();
+		ITask queue = XjusFactory.getQueue();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			List<Index> l = dao.loadIndexes();
 			for (Index idx : l) {
 				if (idx.getActive() && 0 != idx.getMaxRefresh()) {

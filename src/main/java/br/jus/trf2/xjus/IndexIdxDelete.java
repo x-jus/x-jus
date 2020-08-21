@@ -4,7 +4,6 @@ import br.jus.trf2.xjus.IXjus.IndexIdxDeleteRequest;
 import br.jus.trf2.xjus.IXjus.IndexIdxDeleteResponse;
 import br.jus.trf2.xjus.IXjus.SearchIndex;
 import br.jus.trf2.xjus.services.IPersistence;
-import br.jus.trf2.xjus.util.Dao;
 
 public class IndexIdxDelete implements IXjus.IIndexIdxDelete {
 
@@ -12,7 +11,7 @@ public class IndexIdxDelete implements IXjus.IIndexIdxDelete {
 	public void run(IndexIdxDeleteRequest req, IndexIdxDeleteResponse resp) throws Exception {
 		Utils.assertUserCorrente();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			try {
 				dao.removeIndex(req.idx);
 			} catch (Exception e) {

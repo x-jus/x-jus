@@ -13,7 +13,7 @@ public class IndexIdxPost implements IXjus.IIndexIdxPost {
 	public void run(IndexIdxPostRequest req, IndexIdxPostResponse resp) throws Exception {
 		Utils.assertUserCorrente();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			try {
 				Index idx = dao.loadIndex(req.idx);
 				if (idx == null) {

@@ -29,13 +29,11 @@
 			</exclusions>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.47</version>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>7.9.0</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.auth0</groupId>
@@ -74,7 +72,6 @@
 			<version>5.1.22</version>
 			<scope>provided</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>javax.enterprise</groupId>

@@ -1,11 +1,19 @@
 package br.jus.trf2.xjus.util;
 
 import java.io.Closeable;
-import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
@@ -18,7 +26,6 @@ public class Dao implements Closeable, IPersistence {
 	public static ThreadLocal<Dao> current = new ThreadLocal<>();
 
 	public Dao() {
-		this.em = PersistenceManager.INSTANCE.getEntityManager();
 		current.set(this);
 	}
 
@@ -29,7 +36,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public Date sysDate() {
-		return (Date) em.createNativeQuery("select sysdate() from dual").getSingleResult();
+		return new Date();
 	}
 
 	/*
@@ -39,7 +46,11 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public List<Index> loadIndexes() {
-		return (List<Index>) em.createQuery("select from Index").getResultList();
+		List<Index> l = new ArrayList<>();
+		for (String i : Prop.getList("indexes")) {
+			l.add(loadIndex(i));
+		}
+		return l;
 	}
 
 	/*
@@ -48,9 +59,17 @@ public class Dao implements Closeable, IPersistence {
 	 * @see br.jus.trf2.xjus.util.IPersistence#loadIndex(java.lang.String)
 	 */
 	@Override
-	public Index loadIndex(String idx) {
-		return (Index) em.createQuery("select from Index is where is.idx = :idx").setParameter("idx", idx)
-				.getSingleResult();
+	public Index loadIndex(String i) {
+		Index idx = new Index();
+		idx.setIdx(i);
+		idx.setApi(Prop.get(i + ".api"));
+		idx.setActive(Prop.getBool(i + ".active"));
+		idx.setDescr(Prop.get(i + ".descr"));
+		idx.setMaxBuild(Prop.getInt(i + ".build.max"));
+		idx.setMaxRefresh(Prop.getInt(i + ".refresh.max"));
+		idx.setSecret(Prop.get(i + ".secret"));
+		idx.setToken(Prop.get(i + ".token"));
+		return idx;
 	}
 
 	/*
@@ -60,8 +79,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public IndexStatus loadIndexStatus(String idx) {
-		return (IndexStatus) em.createQuery("select from IndexStatus is where is.idx = :idx").setParameter("idx", idx)
-				.getSingleResult();
+		return fileLoad(filenameStatus(idx), IndexStatus.class);
 	}
 
 	/*
@@ -72,8 +90,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public IndexBuildStatus loadIndexBuildStatus(String idx) {
-		return (IndexBuildStatus) em.createQuery("select from IndexBuildStatus is where is.idx = :idx")
-				.setParameter("idx", idx).getSingleResult();
+		return fileLoad(filenameBuildStatus(idx), IndexBuildStatus.class);
 	}
 
 	/*
@@ -84,8 +101,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public IndexRefreshStatus loadIndexRefreshStatus(String idx) {
-		return (IndexRefreshStatus) em.createQuery("select from IndexRefreshStatus is where is.idx = :idx")
-				.setParameter("idx", idx).getSingleResult();
+		return fileLoad(filenameRefreshStatus(idx), IndexRefreshStatus.class);
 	}
 
 	/*
@@ -95,10 +111,21 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public void removeIndex(String idx) {
-		beginTransaction();
-		Index entity = (Index) em.createQuery("select from IndexStatus is where is.idx = :idx").setParameter("idx", idx)
-				.getSingleResult();
-		em.remove(entity);
+		removeFile(filenameStatus(idx));
+	}
+
+	@Override
+	public void removeIndexBuildStatus(String idx) {
+		removeFile(filenameBuildStatus(idx));
+	}
+
+	@Override
+	public void removeIndexRefreshStatus(String idx) {
+		removeFile(filenameRefreshStatus(idx));
+	}
+
+	private void removeFile(String filename) {
+		new File(filename).delete();
 	}
 
 	/*
@@ -109,7 +136,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public void saveIndex(Index idx) {
-		persist(idx);
+		fileSave(filenameStatus(idx.getIdx()), idx);
 	}
 
 	/*
@@ -121,7 +148,7 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public void saveIndexBuildStatus(IndexBuildStatus sts) {
-		persist(sts);
+		fileSave(filenameBuildStatus(sts.getIdx()), sts);
 	}
 
 	/*
@@ -133,66 +160,43 @@ public class Dao implements Closeable, IPersistence {
 	 */
 	@Override
 	public void saveIndexRefreshStatus(IndexRefreshStatus sts) {
-		persist(sts);
+		fileSave(filenameRefreshStatus(sts.getIdx()), sts);
 	}
 
-	private void beginTransaction() {
-		this.em.getTransaction().begin();
-	}
-
-	private void rollbackTransaction() {
-		if (this.em.getTransaction().isActive())
-			this.em.getTransaction().rollback();
-	}
-
-	private static void rollbackCurrentTransaction() {
-		current.get().rollbackTransaction();
-	}
-
-	private <T> T find(Class<T> clazz, Long id) {
-		return em.find(clazz, id);
-	}
-
-	private void persist(Object o) {
-		if (!em.getTransaction().isActive())
-			beginTransaction();
-		this.em.persist(o);
-		this.em.flush();
-	}
-
-	private void remove(Object o) {
-		if (!em.getTransaction().isActive())
-			beginTransaction();
-		this.em.remove(o);
-		this.em.flush();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see br.jus.trf2.xjus.util.IPersistence#close()
-	 */
-	@Override
-	public void close() throws IOException {
-		if (em != null) {
-			if (em.getTransaction().isActive()) {
-				em.flush();
-				em.getTransaction().commit();
-			}
-			em.close();
+	private <T> T fileLoad(String filename, Class<T> clazz) {
+		File file = new File(filename);
+		if (!file.exists())
+			return null;
+		try (FileInputStream fis = new FileInputStream(filename)) {
+			if (fis == null)
+				return null;
+			Yaml yaml = new Yaml(new Constructor(clazz)); // add to threadlocal
+			T sts = (T) yaml.load(fis);
+			return sts;
+		} catch (Exception e) {
+			throw new RuntimeException("Erro lendo " + filename, e);
 		}
 	}
 
-	@Override
-	public void removeIndexRefreshStatus(String idx) {
-		// TODO Auto-generated method stub
-
+	private void fileSave(String filename, Object sts) {
+		try (FileOutputStream fis = new FileOutputStream(filename)) {
+			Yaml yaml = new Yaml(); // add to threadlocal
+			fis.write(yaml.dumpAs(sts, Tag.MAP, null).getBytes(StandardCharsets.UTF_8));
+		} catch (Exception e) {
+			throw new RuntimeException("Erro gravando " + filename, e);
+		}
 	}
 
-	@Override
-	public void removeIndexBuildStatus(String idx) {
-		// TODO Auto-generated method stub
+	private String filenameStatus(String idx) {
+		return "index-" + idx + "-status.yaml";
+	}
 
+	private String filenameBuildStatus(String idx) {
+		return "index-" + idx + "-status-build.yaml";
+	}
+
+	private String filenameRefreshStatus(String idx) {
+		return "index-" + idx + "-status-refresh.yaml";
 	}
 
 }

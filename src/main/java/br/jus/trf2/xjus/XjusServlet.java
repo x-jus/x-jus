@@ -7,32 +7,47 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerServlet;
 
-import br.jus.trf2.xjus.services.gae.HttpGAE;
-import br.jus.trf2.xjus.services.gae.ObjectifyFactoryCreator;
+import br.jus.trf2.xjus.services.IPersistence;
+import br.jus.trf2.xjus.services.ITask;
+import br.jus.trf2.xjus.services.jboss.JBossTaskImpl;
+import br.jus.trf2.xjus.util.Prop;
+import br.jus.trf2.xjus.util.Prop.IPropertyProvider;
 
-public class XjusServlet extends SwaggerServlet {
+public class XjusServlet extends SwaggerServlet implements IPropertyProvider {
 	private static final long serialVersionUID = 1756711359239182178L;
-	static public XjusServlet instance = null;
+	public static IPersistence dao = XjusFactory.getDao();
+
+	public static ITask task = new JBossTaskImpl();
 
 	@Override
 	public void initialize(ServletConfig config) throws ServletException {
-		instance = this;
-
-		SwaggerCall.setHttp(new HttpGAE());
+//		SwaggerCall.setHttp(new HttpGAE());
 
 		super.setAPI(IXjus.class);
 
 		super.setActionPackage("br.jus.trf2.xjus");
 
-		ObjectifyFactoryCreator.create();
+		Prop.setProvider(this);
+
+		Prop.defineGlobalProperties();
+
+//		ObjectifyFactoryCreator.create();
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		super.doPost(req, resp);
+	}
+
+	@Override
+	public String getProp(String nome) {
+		return getProperty(nome);
+	}
+
+	public static XjusServlet getInstance() {
+		return (XjusServlet) instance;
 	}
 
 }

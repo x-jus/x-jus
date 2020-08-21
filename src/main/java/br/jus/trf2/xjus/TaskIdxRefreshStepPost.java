@@ -14,13 +14,12 @@ import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexRefreshStatus;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetRequest;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 import br.jus.trf2.xjus.services.IPersistence;
+import br.jus.trf2.xjus.services.ISearch;
 import br.jus.trf2.xjus.services.ITask;
-import br.jus.trf2.xjus.services.gae.GaeTaskImpl;
-import br.jus.trf2.xjus.services.gae.Search;
-import br.jus.trf2.xjus.util.Dao;
 
 public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 	private static final int MAX_PER_MINUTE_DEFAULT = 10; // 10 per 10 minutes
@@ -30,12 +29,13 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 	public void run(TaskIdxRefreshStepPostRequest req, TaskIdxRefreshStepPostResponse resp) throws Exception {
 		resp.status = "OK";
 
-		ITask queue = new GaeTaskImpl();
+		ITask queue = XjusFactory.getQueue();
+		ISearch search = XjusFactory.getSearch();
 
 		String idx2 = req.idx;
 		System.out.println("revisando índice " + idx2);
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			Index idx = dao.loadIndex(req.idx);
 			if (idx == null)
 				return;
@@ -55,10 +55,9 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			if (sts != null && sts.getRefreshLastId() != null)
 				qs += "&lastid=" + sts.getRefreshLastId();
 
-			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall
-					.callAsync(getContext(), SwaggerServlet.getProperty(idx.getIdx() + ".password"), "get",
-							idx.getApi() + "/all-references" + qs, req, AllReferencesGetResponse.class)
-					.get(30, TimeUnit.SECONDS);
+			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall.callAsync(getContext(),
+					SwaggerServlet.getProperty(idx.getIdx() + ".token"), "GET", idx.getApi() + "/all-references" + qs,
+					new AllReferencesGetRequest(), AllReferencesGetResponse.class).get(30, TimeUnit.SECONDS);
 			AllReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
 
 			if (changedRefs.list == null)
@@ -73,7 +72,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			}
 
 			// Get IDs that as there on the index
-			TreeSet<String> setAntigo = getSetAntigo(idx2, sts != null ? sts.getRefreshLastId() : null, lastId,
+			TreeSet<String> setAntigo = getSetAntigo(search, idx2, sts != null ? sts.getRefreshLastId() : null, lastId,
 					idx.getMaxRefresh() * 2);
 
 			// Encaixa a lista que existe no índice (Antigo) com a nova lista que
@@ -98,7 +97,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 				} else if (oNovo == null || (oAntigo != null && oAntigo.compareTo(oNovo) > 0)) {
 					// O antigo não existe mais no sistema e deve ser excluído do
 					// índice
-					Search.deleteDocument(idx2, oAntigo);
+					search.removeDocument(idx2, oAntigo);
 					if (iAntigo.hasNext())
 						oAntigo = iAntigo.next();
 					else
@@ -131,11 +130,12 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 		}
 	}
 
-	protected TreeSet<String> getSetAntigo(String indexName, String idStart, String idLimit, int maxRefresh) {
+	protected TreeSet<String> getSetAntigo(ISearch search, String indexName, String idStart, String idLimit,
+			int maxRefresh) throws Exception {
 		TreeSet<String> set = new TreeSet<>();
 		{
 			while (true) {
-				List<String> ids = Search.getDocumentIds(indexName, idStart, maxRefresh);
+				List<String> ids = search.getDocumentIds(indexName, idStart, maxRefresh);
 				if (ids == null || ids.size() == 0)
 					return set;
 				for (String s : ids) {

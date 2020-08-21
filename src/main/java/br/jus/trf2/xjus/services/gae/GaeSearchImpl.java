@@ -1,11 +1,16 @@
 package br.jus.trf2.xjus.services.gae;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.appengine.api.search.Document;
 import com.google.appengine.api.search.FacetResult;
 import com.google.appengine.api.search.FacetResultValue;
+import com.google.appengine.api.search.GetRequest;
+import com.google.appengine.api.search.GetResponse;
+import com.google.appengine.api.search.IndexSpec;
 import com.google.appengine.api.search.ScoredDocument;
+import com.google.appengine.api.search.SearchServiceFactory;
 
 import br.jus.trf2.xjus.IXjus.Facet;
 import br.jus.trf2.xjus.IXjus.FacetValue;
@@ -65,6 +70,35 @@ public class GaeSearchImpl implements ISearch {
 			rec.content = r.getExpressions().iterator().next().getHTML();
 			resp.results.add(rec);
 		}
+	}
+
+	public List<String> getDocumentIds(String indexName, String startId, int count) {
+		IndexSpec indexSpec = IndexSpec.newBuilder().setName(indexName).build();
+		com.google.appengine.api.search.Index index = SearchServiceFactory.getSearchService().getIndex(indexSpec);
+
+		List<String> docIds = new ArrayList<>();
+		String id = startId;
+		int i = 0;
+
+		// looping because getRange by default returns up to 100 documents
+		// at a time
+		while (true) {
+			// Return a set of doc_ids.
+			GetRequest request = GetRequest.newBuilder().setReturningIdsOnly(true).setStartId(id)
+					.setLimit(count - i > 100 ? 100 : count - i).setIncludeStart(false).build();
+			GetResponse<Document> response = index.getRange(request);
+			if (response.getResults().isEmpty()) {
+				break;
+			}
+			for (Document doc : response) {
+				id = doc.getId();
+				docIds.add(id);
+				i++;
+			}
+			if (count <= i)
+				break;
+		}
+		return docIds;
 	}
 
 }

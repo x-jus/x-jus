@@ -25,9 +25,9 @@ public class IndexIdxRefreshPost implements IXjus.IIndexIdxRefreshPost {
 	public void run(IndexIdxRefreshPostRequest req, IndexIdxRefreshPostResponse resp) throws Exception {
 		Utils.assertUserCorrente();
 
-		ISearch search = new GaeSearchImpl();
+		ISearch search = XjusFactory.getSearch();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 
 			IndexRefreshStatus sts = new IndexRefreshStatus();
 			sts.setIdx(req.idx);

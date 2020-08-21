@@ -17,8 +17,6 @@ public class XjusMockRecordServlet extends SwaggerServlet {
 
 	@Override
 	public void initialize(ServletConfig config) throws ServletException {
-		SwaggerCall.setHttp(new HttpGAE());
-
 		super.setAPI(IXjusRecordAPI.class);
 
 		super.setActionPackage("br.jus.trf2.xjus.record.api");

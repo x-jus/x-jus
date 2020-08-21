@@ -18,10 +18,10 @@ public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 
 	@Override
 	public void run(IndexIdxQueryGetRequest req, IndexIdxQueryGetResponse resp) throws Exception {
-		Integer page = Integer.valueOf(req.page);
-		Integer perpage = Integer.valueOf(req.perpage);
+		Integer page = req.page != null ? Integer.valueOf(req.page) : null;
+		Integer perpage = req.perpage != null ? Integer.valueOf(req.perpage) : null;
 
-		ISearch search = new GaeSearchImpl();
+		ISearch search = XjusFactory.getSearch();
 
 		if (page == null || page < 1)
 			page = 1;
@@ -32,7 +32,7 @@ public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 		String acl = req.acl;
 
 		// Get indexes password
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			Index idx = dao.loadIndex(req.idx);
 
 			// If index is protected by a password, get ACL from the Authorization

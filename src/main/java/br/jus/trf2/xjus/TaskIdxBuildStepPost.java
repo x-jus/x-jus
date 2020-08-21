@@ -11,12 +11,11 @@ import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
+import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetRequest;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ITask;
-import br.jus.trf2.xjus.services.gae.GaeTaskImpl;
-import br.jus.trf2.xjus.util.Dao;
 
 public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 	private static final int MAX_PER_MINUTE_DEFAULT = 10; // 10 per minute
@@ -26,11 +25,11 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 	public void run(TaskIdxBuildStepPostRequest req, TaskIdxBuildStepPostResponse resp) throws Exception {
 		resp.status = "OK";
 
-		ITask queue = new GaeTaskImpl();
+		ITask queue = XjusFactory.getQueue();
 
 		System.out.println("atualizando índice " + req.idx);
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			Index idx = dao.loadIndex(req.idx);
 			if (idx == null)
 				return;
@@ -53,8 +52,8 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 				qs += "&lastid=" + sts.getBuildLastid();
 
 			SwaggerAsyncResponse<ChangedReferencesGetResponse> changedRefsAsync = SwaggerCall
-					.callAsync(getContext(), idx.getToken(), "get", idx.getApi() + "/changed-references" + qs, req,
-							ChangedReferencesGetResponse.class)
+					.callAsync(getContext(), idx.getToken(), "GET", idx.getApi() + "/changed-references" + qs,
+							new ChangedReferencesGetRequest(), ChangedReferencesGetResponse.class)
 					.get(30, TimeUnit.SECONDS);
 			ChangedReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
 

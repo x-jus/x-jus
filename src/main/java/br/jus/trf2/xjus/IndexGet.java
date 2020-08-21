@@ -11,7 +11,6 @@ import br.jus.trf2.xjus.model.IndexBuildStatus;
 import br.jus.trf2.xjus.model.IndexRefreshStatus;
 import br.jus.trf2.xjus.model.IndexStatus;
 import br.jus.trf2.xjus.services.IPersistence;
-import br.jus.trf2.xjus.util.Dao;
 
 public class IndexGet implements IXjus.IIndexGet {
 
@@ -21,7 +20,7 @@ public class IndexGet implements IXjus.IIndexGet {
 
 		resp.list = new ArrayList<>();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			List<Index> l = dao.loadIndexes();
 			for (Index idx : l) {
 				SearchIndex i = new SearchIndex();

@@ -7,8 +7,6 @@ import br.jus.trf2.xjus.IXjus.TaskBuildStepGetResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ITask;
-import br.jus.trf2.xjus.services.gae.GaeTaskImpl;
-import br.jus.trf2.xjus.util.Dao;
 
 public class TaskBuildStepGet implements IXjus.ITaskBuildStepGet {
 
@@ -18,9 +16,9 @@ public class TaskBuildStepGet implements IXjus.ITaskBuildStepGet {
 
 		System.out.println("atualizando índices");
 
-		ITask queue = new GaeTaskImpl();
+		ITask queue = XjusFactory.getQueue();
 
-		try (IPersistence dao = new Dao()) {
+		try (IPersistence dao = XjusFactory.getDao()) {
 			List<Index> l = dao.loadIndexes();
 			for (Index idx : l) {
 				if (idx.getActive() && 0 != idx.getMaxBuild()) {
