@@ -4,11 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import br.jus.trf2.xjus.IXjus.User;
-
 import com.auth0.jwt.JWTVerifier;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 public class Utils {
 	public static byte[] calcSha1(byte[] content) {
@@ -74,27 +70,4 @@ public class Utils {
 			throw new RuntimeException("Erro ao verificar token JWT", e);
 		}
 	}
-
-	public static User assertUserCorrente() {
-		User user = getUserCorrente();
-		if (user == null)
-			throw new RuntimeException("Usuário não está logado");
-		if (!user.admin)
-			throw new RuntimeException("Usuário não é administrador");
-		return user;
-	}
-
-	public static User getUserCorrente() {
-		UserService userService = UserServiceFactory.getUserService();
-		if (!userService.isUserLoggedIn())
-			return null;
-
-		User u = new User();
-		u.gmail = userService.getCurrentUser().getEmail().toLowerCase();
-		u.admin = userService.isUserAdmin();
-		u.logoutUrl = userService.createLogoutURL("/");
-		u.loginUrl = userService.createLoginURL("/");
-		return u;
-	}
-
 }

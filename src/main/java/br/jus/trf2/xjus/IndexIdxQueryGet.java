@@ -11,8 +11,6 @@ import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ISearch;
-import br.jus.trf2.xjus.services.gae.GaeSearchImpl;
-import br.jus.trf2.xjus.util.Dao;
 
 public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 

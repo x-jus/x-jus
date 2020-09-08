@@ -7,10 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerServlet;
-
-import br.jus.trf2.xjus.services.gae.HttpGAE;
 
 public class XjusMockRecordServlet extends SwaggerServlet {
 	private static final long serialVersionUID = 1756711359239182178L;

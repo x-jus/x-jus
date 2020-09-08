@@ -7,8 +7,6 @@ import br.jus.trf2.xjus.IXjus.TaskRefreshStepGetResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ITask;
-import br.jus.trf2.xjus.services.gae.GaeTaskImpl;
-import br.jus.trf2.xjus.util.Dao;
 
 public class TaskRefreshStepGet implements IXjus.ITaskRefreshStepGet {
 
