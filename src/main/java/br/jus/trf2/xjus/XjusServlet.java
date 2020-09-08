@@ -20,9 +20,11 @@ public class XjusServlet extends SwaggerServlet implements IPropertyProvider {
 	public static IPersistence dao = XjusFactory.getDao();
 
 	public static ITask task = new JBossTaskImpl();
+	public static XjusServlet instance;
 
 	@Override
 	public void initialize(ServletConfig config) throws ServletException {
+		instance = this;
 //		SwaggerCall.setHttp(new HttpGAE());
 
 		super.setAPI(IXjus.class);

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.crivano.swaggerservlet.SwaggerAsyncResponse;
 import com.crivano.swaggerservlet.SwaggerCall;
-import com.crivano.swaggerservlet.SwaggerServlet;
 
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
@@ -55,9 +54,11 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			if (sts != null && sts.getRefreshLastId() != null)
 				qs += "&lastid=" + sts.getRefreshLastId();
 
-			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall.callAsync(getContext(),
-					SwaggerServlet.getProperty(idx.getIdx() + ".token"), "GET", idx.getApi() + "/all-references" + qs,
-					new AllReferencesGetRequest(), AllReferencesGetResponse.class).get(30, TimeUnit.SECONDS);
+			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall
+					.callAsync(getContext(), XjusServlet.getInstance().getProperty(idx.getIdx() + ".token"), "GET",
+							idx.getApi() + "/all-references" + qs, new AllReferencesGetRequest(),
+							AllReferencesGetResponse.class)
+					.get(30, TimeUnit.SECONDS);
 			AllReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
 
 			if (changedRefs.list == null)
