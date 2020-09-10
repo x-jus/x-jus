@@ -31,8 +31,8 @@ public class JBossTimerRefresh {
 	@PostConstruct
 	public void initialize() {
 		ScheduleExpression se = new ScheduleExpression();
-		// Set schedule to every 3 seconds (starting at second 0 of every minute).
-		se.hour("*").minute("*").second("0/5");
+		// Set schedule to every 60 seconds (starting at second 0 of every minute).
+		se.hour("*").minute("*").second("0/60");
 		timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
 	}
 

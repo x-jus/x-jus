@@ -1,18 +1,19 @@
 package br.jus.trf2.xjus.services.jboss;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -23,115 +24,148 @@ import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutMappingRequest;
+import org.elasticsearch.common.bytes.BytesReference;
+import org.elasticsearch.common.io.stream.BytesStream;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.NamedXContentRegistry;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchModule;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
-import com.crivano.swaggerservlet.SwaggerUtils;
+import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.stream.JsonReader;
 
+import br.jus.trf2.xjus.IXjus.Facet;
+import br.jus.trf2.xjus.IXjus.FacetValue;
 import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.IXjus.Record;
+import br.jus.trf2.xjus.Utils;
+import br.jus.trf2.xjus.XjusServlet;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 import br.jus.trf2.xjus.services.ISearch;
+import br.jus.trf2.xjus.util.Prop;
 
-@Singleton
-@Startup
 public class JBossElastic implements ISearch {
 
 	public static ISearch INSTANCE;
 	private RestHighLevelClient client;
+	private static final ObjectMapper mapper = new ObjectMapper();
 
-	@PostConstruct
 	public void initialize() {
 		INSTANCE = this;
+
 		RestHighLevelClient cli = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
 
 		try {
-			// Delete index
-			try {
-				DeleteIndexRequest request = new DeleteIndexRequest("test");
-				AcknowledgedResponse deleteIndexResponse = cli.indices().delete(request, RequestOptions.DEFAULT);
-			} catch (Exception ex) {
-				SwaggerUtils.log(this.getClass()).warn("Não consegui remover o índice", ex);
-			}
+			for (String idx : Prop.getList("indexes")) {
 
-			// Create index
-			{
-				CreateIndexRequest request = new CreateIndexRequest("test");
-				XContentBuilder builder = XContentFactory.jsonBuilder();
-				builder.startObject();
-				{
-					builder.startObject("properties");
+				GetIndexRequest requestExists = new GetIndexRequest(idx);
+				boolean exists = cli.indices().exists(requestExists, RequestOptions.DEFAULT);
+				if (!exists) {
+					// Create index
 					{
-						builder.startObject("id");
-						{
-							builder.field("type", "keyword");
-						}
-						builder.endObject();
-						builder.startObject("acl");
-						{
-							builder.field("type", "keyword");
-						}
-						builder.endObject();
-						builder.startObject("code");
-						{
-							builder.field("type", "keyword");
-						}
-						builder.endObject();
-						builder.startObject("title");
-						{
-							builder.field("type", "text");
-						}
-						builder.endObject();
-						builder.startObject("content");
-						{
-							builder.field("type", "text");
-						}
-						builder.endObject();
-						builder.startObject("date");
-						{
-							builder.field("type", "date");
-						}
-						builder.endObject();
-						builder.startObject("url");
-						{
-							builder.field("type", "keyword");
-						}
-						builder.endObject();
-						builder.startObject("facet_*");
-						{
-							builder.field("type", "keyword");
-						}
-						builder.endObject();
+						CreateIndexRequest request = org.elasticsearch.client.Requests.createIndexRequest(idx);
+						CreateIndexResponse createIndexResponse = cli.indices().create(request, RequestOptions.DEFAULT);
 					}
-					builder.endObject();
-				}
-				builder.endObject();
-				request.mapping("record", builder);
-				CreateIndexResponse createIndexResponse = cli.indices().create(request, RequestOptions.DEFAULT);
-			}
 
-			try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
-				PutMappingRequest request = new PutMappingRequest("test");
-				final XContentBuilder builder = jsonBuilder.startObject().startObject("record")
-						.startObject("properties").startObject("id").field("type", "keyword").field("fielddata", true)
-						.endObject().endObject().endObject().endObject();
-				AcknowledgedResponse putMappingResponse = cli.indices().putMapping(request, RequestOptions.DEFAULT);
+					try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
+						PutMappingRequest request = new PutMappingRequest(idx);
+						final XContentBuilder builder = jsonBuilder.startObject().startObject("record")
+								.startObject("properties").startObject("id").field("type", "keyword")
+								.field("fielddata", true).endObject().endObject().endObject().endObject();
+						String json = Utils.convertStreamToString(
+								this.getClass().getResourceAsStream("create-index-request.json"));
+						request.source(json, XContentType.JSON);
+						AcknowledgedResponse putMappingResponse = cli.indices().putMapping(request,
+								RequestOptions.DEFAULT);
+					}
+				} else {
+					// Delete index
+//					try {
+//						DeleteIndexRequest request = new DeleteIndexRequest(idx);
+//						AcknowledgedResponse deleteIndexResponse = cli.indices().delete(request, RequestOptions.DEFAULT);
+//					} catch (Exception ex) {
+//						SwaggerUtils.log(this.getClass()).warn("Não consegui remover o índice", ex);
+//					}
+				}
+
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 
 		client = cli;
+	}
+
+	private void waitForXjusServletToLoad() {
+		boolean ok = false;
+		do {
+			try {
+				Prop.getList("indexes");
+				ok = true;
+			} catch (NullPointerException ex1) {
+				try {
+					Thread.sleep(1000);
+				} catch (Exception ex2) {
+				}
+			}
+		} while (!ok);
+	}
+
+	private static class BAOS extends BytesStream {
+
+		private final ByteArrayOutputStream delegate = new ByteArrayOutputStream();
+
+		@Override
+		public void writeByte(byte b) throws IOException {
+			delegate.write(b);
+		}
+
+		@Override
+		public void writeBytes(byte[] b, int offset, int length) throws IOException {
+			delegate.write(b, offset, length);
+		}
+
+		@Override
+		public void flush() throws IOException {
+			delegate.flush();
+		}
+
+		@Override
+		public void close() throws IOException {
+			flush();
+		}
+
+		@Override
+		public void reset() throws IOException {
+			delegate.reset();
+		}
+
+		@Override
+		public BytesReference bytes() {
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			return new String(delegate.toByteArray());
+		}
 	}
 
 	@PreDestroy
@@ -200,13 +234,43 @@ public class JBossElastic implements ISearch {
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
 			IndexIdxQueryGetResponse resp) throws Exception {
 		SearchRequest searchRequest = new SearchRequest(idx);
+
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+		SearchModule searchModule = new SearchModule(Settings.EMPTY, false, Collections.emptyList());
+		try (XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(
+				new NamedXContentRegistry(searchModule.getNamedXContents()), null,
+				XjusServlet.getInstance().getProperty("index." + idx + ".query.json"))) {
+			searchSourceBuilder.parseXContent(parser);
+		}
+
+		// SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 //		searchSourceBuilder.query(QueryBuilders.matchAllQuery());
 //		MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("user", "kimchy");
 //		searchSourceBuilder.query(matchQueryBuilder);
 
+		// This is necessary to output facets in the same order that they are defined in
+		// the .query.json property
+		List<String> facetNames = new ArrayList<>();
+		try (StringReader sr = new StringReader(searchSourceBuilder.aggregations().toString());
+				JsonReader reader = new JsonReader(sr)) {
+			reader.beginObject();
+			while (reader.hasNext()) {
+				String name = reader.nextName();
+				facetNames.add(name);
+				reader.skipValue();
+			}
+			reader.endObject();
+		}
+
 		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 		boolQueryBuilder.must(new QueryStringQueryBuilder(filter));
+
+		if (facets != null && !facets.trim().isEmpty()) {
+			for (String f : facets.split(",")) {
+				String[] a = f.split(":", 2);
+				boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
+			}
+		}
 
 		if (acl == null)
 			acl = "PUBLIC";
@@ -237,6 +301,11 @@ public class JBossElastic implements ISearch {
 		searchSourceBuilder.from(offset);
 		searchSourceBuilder.size(perpage);
 
+//
+//		System.err.println(b.string());
+//
+//		searchSourceBuilder.toXContent(builder, params);
+
 //		if (facets != null) {
 //			String[] a = facets.split(",");
 //			for (String f : a)
@@ -258,6 +327,30 @@ public class JBossElastic implements ISearch {
 			r.content = highlights(hit, "content");
 			// r.field;
 			resp.results.add(r);
+		}
+
+		resp.facets = new ArrayList<>();
+		for (String agg : facetNames) {
+			Facet f = new Facet();
+			Terms g = searchResponse.getAggregations().get(agg);
+
+			String name = g.getName();
+			f.name = name;
+			if (g.getMetadata() != null && g.getMetadata().get("title") != null)
+				f.name = g.getMetadata().get("title").toString();
+			f.values = new ArrayList<>();
+
+			for (Bucket bucket : g.getBuckets()) {
+				FacetValue fv = new FacetValue();
+				fv.name = bucket.getKeyAsString();
+				fv.count = (double) bucket.getDocCount();
+				String field = name;
+				if (g.getMetadata() != null && g.getMetadata().get("field") != null)
+					field = g.getMetadata().get("field").toString();
+				fv.refinementToken = field + ":" + bucket.getKeyAsString();
+				f.values.add(fv);
+			}
+			resp.facets.add(f);
 		}
 	}
 

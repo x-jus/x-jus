@@ -70,4 +70,10 @@ public class Utils {
 			throw new RuntimeException("Erro ao verificar token JWT", e);
 		}
 	}
+
+	public static String convertStreamToString(java.io.InputStream is) {
+		@SuppressWarnings("resource")
+		java.util.Scanner s = new java.util.Scanner(is, "UTF-8").useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
+	}
 }

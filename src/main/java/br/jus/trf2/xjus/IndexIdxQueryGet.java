@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.RequestScoped;
+
 import com.crivano.swaggerservlet.SwaggerServlet;
 
 import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetRequest;
@@ -12,6 +14,7 @@ import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ISearch;
 
+@RequestScoped
 public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 
 	@Override

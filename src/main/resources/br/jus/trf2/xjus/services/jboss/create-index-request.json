@@ -1,0 +1,35 @@
+{
+	"dynamic_templates": [
+		{
+			"facets": {
+				"match": "facet_*",
+				"mapping": {
+					"type": "keyword"
+				}
+			}
+		}
+	],
+	"properties": {
+		"date": {
+			"type": "date"
+		},
+		"code": {
+			"type": "keyword"
+		},
+		"id": {
+			"type": "keyword"
+		},
+		"acl": {
+			"type": "keyword"
+		},
+		"title": {
+			"type": "text"
+		},
+		"content": {
+			"type": "text"
+		},
+		"url": {
+			"type": "keyword"
+		}
+	}
+}

@@ -19,8 +19,6 @@ public class JBossTaskImpl implements ITask {
 	// Set up all the default values
 	private static final String DEFAULT_CONNECTION_FACTORY = "java:jboss/DefaultJMSConnectionFactory";
 	private static final String DEFAULT_DESTINATION = "java:jboss/exported/jms/queue/Xjus";
-	private static final String DEFAULT_USERNAME = "test";
-	private static final String DEFAULT_PASSWORD = "test123";
 
 	public static void add(String method, String pathInfo) {
 		Context envContext = null;
@@ -29,7 +27,7 @@ public class JBossTaskImpl implements ITask {
 			envContext = (Context) initContext.lookup("java:");
 			ConnectionFactory connectionFactory = (ConnectionFactory) envContext.lookup(DEFAULT_CONNECTION_FACTORY);
 			Destination destination = (Destination) envContext.lookup(DEFAULT_DESTINATION);
-			try (JMSContext context = connectionFactory.createContext(DEFAULT_USERNAME, DEFAULT_PASSWORD)) {
+			try (JMSContext context = connectionFactory.createContext()) {
 				JbossMessage msg = new JbossMessage();
 				msg.method = method;
 				msg.pathInfo = pathInfo;

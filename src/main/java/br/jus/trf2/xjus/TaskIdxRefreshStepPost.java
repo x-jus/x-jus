@@ -55,8 +55,8 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 				qs += "&lastid=" + sts.getRefreshLastId();
 
 			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall
-					.callAsync(getContext(), XjusServlet.getInstance().getProperty(idx.getIdx() + ".token"), "GET",
-							idx.getApi() + "/all-references" + qs, new AllReferencesGetRequest(),
+					.callAsync(getContext(), XjusServlet.getInstance().getProperty("index." + idx.getIdx() + ".token"),
+							"GET", idx.getApi() + "/all-references" + qs, new AllReferencesGetRequest(),
 							AllReferencesGetResponse.class)
 					.get(30, TimeUnit.SECONDS);
 			AllReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();

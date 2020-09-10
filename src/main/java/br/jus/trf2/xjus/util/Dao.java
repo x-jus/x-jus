@@ -62,13 +62,13 @@ public class Dao implements Closeable, IPersistence {
 	public Index loadIndex(String i) {
 		Index idx = new Index();
 		idx.setIdx(i);
-		idx.setApi(Prop.get(i + ".api"));
-		idx.setActive(Prop.getBool(i + ".active"));
-		idx.setDescr(Prop.get(i + ".descr"));
-		idx.setMaxBuild(Prop.getInt(i + ".build.max"));
-		idx.setMaxRefresh(Prop.getInt(i + ".refresh.max"));
-		idx.setSecret(Prop.get(i + ".secret"));
-		idx.setToken(Prop.get(i + ".token"));
+		idx.setApi(Prop.get("index." + i + ".api"));
+		idx.setActive(Prop.getBool("index." + i + ".active"));
+		idx.setDescr(Prop.get("index." + i + ".descr"));
+		idx.setMaxBuild(Prop.getInt("index." + i + ".build.docs.per.min"));
+		idx.setMaxRefresh(Prop.getInt("index." + i + ".refresh.docs.per.min"));
+		idx.setSecret(Prop.get("index." + i + ".secret"));
+		idx.setToken(Prop.get("index." + i + ".token"));
 		return idx;
 	}
 

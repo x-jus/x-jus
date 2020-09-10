@@ -2,6 +2,9 @@ package br.jus.trf2.xjus;
 
 import java.io.IOException;
 
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +14,7 @@ import com.crivano.swaggerservlet.SwaggerServlet;
 
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ITask;
+import br.jus.trf2.xjus.services.jboss.JBossElastic;
 import br.jus.trf2.xjus.services.jboss.JBossTaskImpl;
 import br.jus.trf2.xjus.util.Prop;
 import br.jus.trf2.xjus.util.Prop.IPropertyProvider;
@@ -21,11 +25,13 @@ public class XjusServlet extends SwaggerServlet implements IPropertyProvider {
 
 	public static ITask task = new JBossTaskImpl();
 	public static XjusServlet instance;
+	private BeanManager beanManager = null;
 
 	@Override
-	public void initialize(ServletConfig config) throws ServletException {
+	public void initialize(ServletConfig config) throws Exception {
 		instance = this;
-//		SwaggerCall.setHttp(new HttpGAE());
+
+		this.beanManager = (BeanManager) new InitialContext().lookup("java:comp/BeanManager");
 
 		super.setAPI(IXjus.class);
 
@@ -33,9 +39,10 @@ public class XjusServlet extends SwaggerServlet implements IPropertyProvider {
 
 		Prop.setProvider(this);
 
-		Prop.defineGlobalProperties();
+		Prop.defineProperties();
 
-//		ObjectifyFactoryCreator.create();
+		JBossElastic je = new JBossElastic();
+		je.initialize();
 	}
 
 	@Override
@@ -50,6 +57,15 @@ public class XjusServlet extends SwaggerServlet implements IPropertyProvider {
 
 	public static XjusServlet getInstance() {
 		return (XjusServlet) instance;
+	}
+
+	@Override
+	public <T> T newInstance(Class<T> clazz) throws InstantiationException, IllegalAccessException {
+		Bean<?> bean = this.beanManager.resolve(this.beanManager.getBeans(clazz));
+		if (bean == null)
+			return super.newInstance(clazz);
+		return (T) this.beanManager.getReference(bean, bean.getBeanClass(),
+				this.beanManager.createCreationalContext(bean));
 	}
 
 }

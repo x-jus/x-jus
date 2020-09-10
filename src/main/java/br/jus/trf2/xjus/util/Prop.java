@@ -66,16 +66,17 @@ public class Prop {
 		}
 	}
 
-	public static void defineGlobalProperties() {
+	public static void defineProperties() {
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {
-			provider.addRestrictedProperty(i + ".api");
-			provider.addPublicProperty(i + ".active", "true");
-			provider.addPublicProperty(i + ".descr", "");
-			provider.addPublicProperty(i + ".build.max", "10");
-			provider.addPublicProperty(i + ".refresh.max", "10");
-			provider.addPrivateProperty(i + ".secret");
-			provider.addPrivateProperty(i + ".token");
+			provider.addRestrictedProperty("index." + i + ".api");
+			provider.addPublicProperty("index." + i + ".active", "true");
+			provider.addPublicProperty("index." + i + ".descr", "");
+			provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
+			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "10");
+			provider.addPrivateProperty("index." + i + ".secret");
+			provider.addPrivateProperty("index." + i + ".token");
+			provider.addPublicProperty("index." + i + ".query.json", "{}");
 		}
 	}
 }
