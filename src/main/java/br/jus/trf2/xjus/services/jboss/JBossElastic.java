@@ -1,9 +1,10 @@
 package br.jus.trf2.xjus.services.jboss;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -41,7 +42,6 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchModule;
-import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -67,10 +67,12 @@ public class JBossElastic implements ISearch {
 	private RestHighLevelClient client;
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	public void initialize() {
+	public void initialize() throws URISyntaxException {
 		INSTANCE = this;
 
-		RestHighLevelClient cli = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+		URI uri = new URI(Prop.get("elasticsearch.url"));
+		RestHighLevelClient cli = new RestHighLevelClient(
+				RestClient.builder(new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())));
 
 		try {
 			for (String idx : Prop.getList("indexes")) {

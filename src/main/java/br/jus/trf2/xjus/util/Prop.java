@@ -67,6 +67,7 @@ public class Prop {
 	}
 
 	public static void defineProperties() {
+		provider.addRestrictedProperty("elasticsearch.url", "http://localhost:9200");
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {
 			provider.addRestrictedProperty("index." + i + ".api");
