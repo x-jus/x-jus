@@ -68,6 +68,11 @@ public class Prop {
 
 	public static void defineProperties() {
 		provider.addRestrictedProperty("elasticsearch.url", "http://localhost:9200");
+		provider.addRestrictedProperty("elasticsearch.auth.basic.user", null);
+		if (get("elasticsearch.auth.basic.user") != null)
+			provider.addPrivateProperty("elasticsearch.auth.basic.password");
+		else
+			provider.addPrivateProperty("elasticsearch.auth.basic.password", null);
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {
 			provider.addRestrictedProperty("index." + i + ".api");

@@ -3,6 +3,7 @@ package br.jus.trf2.xjus.services.jboss;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,6 +14,11 @@ import java.util.List;
 import javax.annotation.PreDestroy;
 
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -24,6 +30,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.PutMappingRequest;
@@ -49,6 +57,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
+import com.crivano.swaggerservlet.SwaggerUtils;
 import com.google.gson.stream.JsonReader;
 
 import br.jus.trf2.xjus.IXjus.Facet;
@@ -71,46 +80,72 @@ public class JBossElastic implements ISearch {
 		INSTANCE = this;
 
 		URI uri = new URI(Prop.get("elasticsearch.url"));
-		RestHighLevelClient cli = new RestHighLevelClient(
-				RestClient.builder(new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())));
+		RestClientBuilder builder = RestClient.builder(new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme()));
 
-		try {
-			for (String idx : Prop.getList("indexes")) {
+		if (Prop.get("elasticsearch.auth.basic.user") != null) {
+			final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+			credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
+					Prop.get("elasticsearch.auth.basic.user"), Prop.get("elasticsearch.auth.basic.password")));
 
-				GetIndexRequest requestExists = new GetIndexRequest(idx);
-				boolean exists = cli.indices().exists(requestExists, RequestOptions.DEFAULT);
-				if (!exists) {
-					// Create index
-					{
-						CreateIndexRequest request = org.elasticsearch.client.Requests.createIndexRequest(idx);
-						CreateIndexResponse createIndexResponse = cli.indices().create(request, RequestOptions.DEFAULT);
-					}
+			builder.setHttpClientConfigCallback(new HttpClientConfigCallback() {
+				@Override
+				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+					return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+				}
+			});
+		}
 
-					try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
-						PutMappingRequest request = new PutMappingRequest(idx);
-						final XContentBuilder builder = jsonBuilder.startObject().startObject("record")
-								.startObject("properties").startObject("id").field("type", "keyword")
-								.field("fielddata", true).endObject().endObject().endObject().endObject();
-						String json = Utils.convertStreamToString(
-								this.getClass().getResourceAsStream("create-index-request.json"));
-						request.source(json, XContentType.JSON);
-						AcknowledgedResponse putMappingResponse = cli.indices().putMapping(request,
-								RequestOptions.DEFAULT);
-					}
-				} else {
-					// Delete index
+		RestHighLevelClient cli = new RestHighLevelClient(builder);
+
+		boolean fConnectException;
+		do {
+			fConnectException = false;
+			try {
+				for (String idx : Prop.getList("indexes")) {
+
+					GetIndexRequest requestExists = new GetIndexRequest(idx);
+					boolean exists = cli.indices().exists(requestExists, RequestOptions.DEFAULT);
+					SwaggerUtils.log(this.getClass())
+							.info("Conexão com o ElasticSearch em " + Prop.get("elasticsearch.url") + " OK.");
+					if (!exists) {
+						// Create index
+						{
+							CreateIndexRequest request = org.elasticsearch.client.Requests.createIndexRequest(idx);
+							CreateIndexResponse createIndexResponse = cli.indices().create(request,
+									RequestOptions.DEFAULT);
+						}
+
+						try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
+							PutMappingRequest request = new PutMappingRequest(idx);
+							String json = Utils.convertStreamToString(
+									this.getClass().getResourceAsStream("create-index-request.json"));
+							request.source(json, XContentType.JSON);
+							AcknowledgedResponse putMappingResponse = cli.indices().putMapping(request,
+									RequestOptions.DEFAULT);
+						}
+					} else {
+						// Delete index
 //					try {
 //						DeleteIndexRequest request = new DeleteIndexRequest(idx);
 //						AcknowledgedResponse deleteIndexResponse = cli.indices().delete(request, RequestOptions.DEFAULT);
 //					} catch (Exception ex) {
 //						SwaggerUtils.log(this.getClass()).warn("Não consegui remover o índice", ex);
 //					}
-				}
+					}
 
+				}
+			} catch (ConnectException ex) {
+				SwaggerUtils.log(this.getClass()).info("Não foi possível conectar com o ElasticSearch em "
+						+ Prop.get("elasticsearch.url") + ", tentando novamente em 5 segundos.");
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+				}
+				fConnectException = true;
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
 			}
-		} catch (Exception ex) {
-			throw new RuntimeException(ex);
-		}
+		} while (fConnectException);
 
 		client = cli;
 	}
