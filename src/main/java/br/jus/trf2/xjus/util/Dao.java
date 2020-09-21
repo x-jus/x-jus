@@ -188,15 +188,15 @@ public class Dao implements Closeable, IPersistence {
 	}
 
 	private String filenameStatus(String idx) {
-		return "index-" + idx + "-status.yaml";
+		return Prop.get("status.dir") + "/index-" + idx + "-status.yaml";
 	}
 
 	private String filenameBuildStatus(String idx) {
-		return "index-" + idx + "-status-build.yaml";
+		return Prop.get("status.dir") + "/index-" + idx + "-status-build.yaml";
 	}
 
 	private String filenameRefreshStatus(String idx) {
-		return "index-" + idx + "-status-refresh.yaml";
+		return Prop.get("status.dir") + "/index-" + idx + "-status-refresh.yaml";
 	}
 
 }

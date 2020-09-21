@@ -73,6 +73,7 @@ public class Prop {
 			provider.addPrivateProperty("elasticsearch.auth.basic.password");
 		else
 			provider.addPrivateProperty("elasticsearch.auth.basic.password", null);
+		provider.addRestrictedProperty("status.dir", "/var/tmp");
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {
 			provider.addRestrictedProperty("index." + i + ".api");
