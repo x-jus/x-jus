@@ -2,6 +2,8 @@ package br.jus.trf2.xjus;
 
 import java.util.List;
 
+import com.crivano.swaggerservlet.SwaggerUtils;
+
 import br.jus.trf2.xjus.IXjus.TaskBuildStepGetRequest;
 import br.jus.trf2.xjus.IXjus.TaskBuildStepGetResponse;
 import br.jus.trf2.xjus.model.Index;
@@ -14,7 +16,7 @@ public class TaskBuildStepGet implements IXjus.ITaskBuildStepGet {
 	public void run(TaskBuildStepGetRequest req, TaskBuildStepGetResponse resp) throws Exception {
 		resp.status = "OK";
 
-		System.out.println("atualizando índices");
+		SwaggerUtils.log(this.getClass()).debug("atualizando índices");
 
 		ITask queue = XjusFactory.getQueue();
 

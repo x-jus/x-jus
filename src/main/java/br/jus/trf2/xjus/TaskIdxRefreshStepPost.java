@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.crivano.swaggerservlet.SwaggerAsyncResponse;
 import com.crivano.swaggerservlet.SwaggerCall;
+import com.crivano.swaggerservlet.SwaggerUtils;
 
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
@@ -32,7 +33,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 		ISearch search = XjusFactory.getSearch();
 
 		String idx2 = req.idx;
-		System.out.println("revisando índice " + idx2);
+		SwaggerUtils.log(this.getClass()).debug("revisando índice " + idx2);
 
 		try (IPersistence dao = XjusFactory.getDao()) {
 			Index idx = dao.loadIndex(req.idx);
@@ -45,7 +46,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			int count = queue.getRefreshTaskCount();
 			if (count > (MAX_INDEXES
 					+ 2 * (idx.getMaxRefresh() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxRefresh()))) {
-				System.out.println("índice " + idx2 + " - adiando revisão pois há muitas tarefas ativas - " + count);
+				SwaggerUtils.log(this.getClass()).debug("índice " + idx2 + " - adiando revisão pois há muitas tarefas ativas - " + count);
 				return;
 			}
 

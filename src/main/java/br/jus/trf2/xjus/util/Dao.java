@@ -4,6 +4,9 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
@@ -179,9 +182,13 @@ public class Dao implements Closeable, IPersistence {
 	}
 
 	private void fileSave(String filename, Object sts) {
-		try (FileOutputStream fis = new FileOutputStream(filename)) {
-			Yaml yaml = new Yaml(); // add to threadlocal
-			fis.write(yaml.dumpAs(sts, Tag.MAP, null).getBytes(StandardCharsets.UTF_8));
+		Yaml yaml = new Yaml(); // add to threadlocal
+		byte[] bytes = yaml.dumpAs(sts, Tag.MAP, null).getBytes(StandardCharsets.UTF_8);
+		ByteBuffer buff = ByteBuffer.wrap(bytes);
+		try (FileOutputStream fis = new FileOutputStream(filename, false);
+				FileChannel channel = fis.getChannel();
+				FileLock lock = channel.lock()) {
+			channel.write(buff);
 		} catch (Exception e) {
 			throw new RuntimeException("Erro gravando " + filename, e);
 		}

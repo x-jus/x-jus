@@ -412,6 +412,8 @@ public class JBossElastic implements ISearch {
 	}
 
 	private String highlights(SearchHit hit, String field) {
+		if (hit == null || hit.getHighlightFields() == null || hit.getHighlightFields().get(field) == null)
+			return null;
 		Text[] fragments = hit.getHighlightFields().get(field).fragments();
 		if (fragments == null)
 			return null;

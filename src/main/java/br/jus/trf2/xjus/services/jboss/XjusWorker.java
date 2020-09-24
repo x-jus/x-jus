@@ -30,7 +30,7 @@ public class XjusWorker implements MessageListener {
 				Object o = ((ObjectMessage) rcvMessage).getObject();
 				if (o instanceof JbossMessage) {
 					JbossMessage msg = (JbossMessage) o;
-					LOGGER.info("received Message from queue");
+					LOGGER.fine("received Message from queue");
 					XjusServlet.getInstance().execute(msg.method, msg.pathInfo, null);
 				}
 			} else {

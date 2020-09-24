@@ -27,7 +27,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 
 		ITask queue = XjusFactory.getQueue();
 
-		System.out.println("atualizando índice " + req.idx);
+		SwaggerUtils.log(this.getClass()).debug("atualizando índice " + req.idx);
 
 		try (IPersistence dao = XjusFactory.getDao()) {
 			Index idx = dao.loadIndex(req.idx);
@@ -39,8 +39,8 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 			// Verify the number of tasks in the queue to avoid a fork-bomb
 			int count = queue.getBuildTaskCount();
 			if (count > (MAX_INDEXES + 2 * (idx.getMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxBuild()))) {
-				System.out.println(
-						"índice " + req.idx + " - adiando atualização pois há muitas tarefas ativas - " + count);
+				SwaggerUtils.log(this.getClass())
+						.debug("índice " + req.idx + " - adiando atualização pois há muitas tarefas ativas - " + count);
 				return;
 			}
 
