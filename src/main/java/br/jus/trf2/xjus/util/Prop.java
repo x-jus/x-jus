@@ -80,7 +80,7 @@ public class Prop {
 			provider.addPublicProperty("index." + i + ".active", "true");
 			provider.addPublicProperty("index." + i + ".descr", "");
 			provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
-			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "10");
+			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
 			provider.addPrivateProperty("index." + i + ".secret");
 			provider.addPrivateProperty("index." + i + ".token");
 			provider.addPublicProperty("index." + i + ".query.json", "{}");

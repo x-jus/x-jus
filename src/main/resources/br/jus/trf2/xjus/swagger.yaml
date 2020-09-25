@@ -69,6 +69,32 @@ paths:
           description: Error ocurred
           schema:
             $ref: "#/definitions/Error"
+  /index/{idx}/status:
+    get:
+      description: Retorna o status do índice
+      tags: [query]
+      parameters:
+        - $ref: "#/parameters/idx"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              count:
+                $ref: "#/definitions/Count"
+              buildCount:
+                $ref: "#/definitions/Count"
+              buildLastId:
+                $ref: "#/definitions/LastId"
+              buildLastDate:
+                $ref: "#/definitions/LastDate"
+              refreshLastId:
+                $ref: "#/definitions/LastId"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
 
   /index/{idx}/record/{id}:
     get:

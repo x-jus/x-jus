@@ -154,66 +154,7 @@ public interface IXjus {
 	}
 
 	public interface IUserGet extends ISwaggerMethod {
-		public void run(UserGetRequest req, UserGetResponse resp)
-				throws Exception;
-	}
-
-	public class IndexGetRequest implements ISwaggerRequest {
-	}
-
-	public class IndexGetResponse implements ISwaggerResponse {
-		public List<SearchIndex> list;
-	}
-
-	public interface IIndexGet extends ISwaggerMethod {
-		public void run(IndexGetRequest req, IndexGetResponse resp)
-				throws Exception;
-	}
-
-	public class IndexIdxPostRequest implements ISwaggerRequest {
-		public String idx;
-		public String descr;
-		public String api;
-		public String token;
-		public Boolean active;
-		public String maxBuild;
-		public String maxRefresh;
-		public String secret;
-	}
-
-	public class IndexIdxPostResponse implements ISwaggerResponse {
-		public SearchIndex index;
-	}
-
-	public interface IIndexIdxPost extends ISwaggerMethod {
-		public void run(IndexIdxPostRequest req, IndexIdxPostResponse resp)
-				throws Exception;
-	}
-
-	public class IndexIdxDeleteRequest implements ISwaggerRequest {
-		public String idx;
-	}
-
-	public class IndexIdxDeleteResponse implements ISwaggerResponse {
-		public SearchIndex index;
-	}
-
-	public interface IIndexIdxDelete extends ISwaggerMethod {
-		public void run(IndexIdxDeleteRequest req, IndexIdxDeleteResponse resp)
-				throws Exception;
-	}
-
-	public class IndexIdxRefreshPostRequest implements ISwaggerRequest {
-		public String idx;
-	}
-
-	public class IndexIdxRefreshPostResponse implements ISwaggerResponse {
-		public String id;
-	}
-
-	public interface IIndexIdxRefreshPost extends ISwaggerMethod {
-		public void run(IndexIdxRefreshPostRequest req,
-				IndexIdxRefreshPostResponse resp) throws Exception;
+		public void run(UserGetRequest req, UserGetResponse resp) throws Exception;
 	}
 
 	public class IndexIdxQueryGetRequest implements ISwaggerRequest {
@@ -232,8 +173,23 @@ public interface IXjus {
 	}
 
 	public interface IIndexIdxQueryGet extends ISwaggerMethod {
-		public void run(IndexIdxQueryGetRequest req,
-				IndexIdxQueryGetResponse resp) throws Exception;
+		public void run(IndexIdxQueryGetRequest req, IndexIdxQueryGetResponse resp) throws Exception;
+	}
+
+	public class IndexIdxStatusGetRequest implements ISwaggerRequest {
+		public String idx;
+	}
+
+	public class IndexIdxStatusGetResponse implements ISwaggerResponse {
+		public Double count;
+		public Double buildCount;
+		public String buildLastId;
+		public Date buildLastDate;
+		public String refreshLastId;
+	}
+
+	public interface IIndexIdxStatusGet extends ISwaggerMethod {
+		public void run(IndexIdxStatusGetRequest req, IndexIdxStatusGetResponse resp) throws Exception;
 	}
 
 	public class IndexIdxRecordIdGetRequest implements ISwaggerRequest {
@@ -254,8 +210,7 @@ public interface IXjus {
 	}
 
 	public interface IIndexIdxRecordIdGet extends ISwaggerMethod {
-		public void run(IndexIdxRecordIdGetRequest req,
-				IndexIdxRecordIdGetResponse resp) throws Exception;
+		public void run(IndexIdxRecordIdGetRequest req, IndexIdxRecordIdGetResponse resp) throws Exception;
 	}
 
 	public class IndexIdxRecordPostRequest implements ISwaggerRequest {
@@ -267,8 +222,7 @@ public interface IXjus {
 	}
 
 	public interface IIndexIdxRecordPost extends ISwaggerMethod {
-		public void run(IndexIdxRecordPostRequest req,
-				IndexIdxRecordPostResponse resp) throws Exception;
+		public void run(IndexIdxRecordPostRequest req, IndexIdxRecordPostResponse resp) throws Exception;
 	}
 
 	public class TaskBuildStepGetRequest implements ISwaggerRequest {
@@ -279,8 +233,7 @@ public interface IXjus {
 	}
 
 	public interface ITaskBuildStepGet extends ISwaggerMethod {
-		public void run(TaskBuildStepGetRequest req,
-				TaskBuildStepGetResponse resp) throws Exception;
+		public void run(TaskBuildStepGetRequest req, TaskBuildStepGetResponse resp) throws Exception;
 	}
 
 	public class TaskIdxBuildStepPostRequest implements ISwaggerRequest {
@@ -292,8 +245,7 @@ public interface IXjus {
 	}
 
 	public interface ITaskIdxBuildStepPost extends ISwaggerMethod {
-		public void run(TaskIdxBuildStepPostRequest req,
-				TaskIdxBuildStepPostResponse resp) throws Exception;
+		public void run(TaskIdxBuildStepPostRequest req, TaskIdxBuildStepPostResponse resp) throws Exception;
 	}
 
 	public class TaskRefreshStepGetRequest implements ISwaggerRequest {
@@ -304,8 +256,7 @@ public interface IXjus {
 	}
 
 	public interface ITaskRefreshStepGet extends ISwaggerMethod {
-		public void run(TaskRefreshStepGetRequest req,
-				TaskRefreshStepGetResponse resp) throws Exception;
+		public void run(TaskRefreshStepGetRequest req, TaskRefreshStepGetResponse resp) throws Exception;
 	}
 
 	public class TaskIdxRefreshStepPostRequest implements ISwaggerRequest {
@@ -317,8 +268,7 @@ public interface IXjus {
 	}
 
 	public interface ITaskIdxRefreshStepPost extends ISwaggerMethod {
-		public void run(TaskIdxRefreshStepPostRequest req,
-				TaskIdxRefreshStepPostResponse resp) throws Exception;
+		public void run(TaskIdxRefreshStepPostRequest req, TaskIdxRefreshStepPostResponse resp) throws Exception;
 	}
 
 	public class TaskIdxRecordIdRefreshPostRequest implements ISwaggerRequest {
@@ -332,8 +282,8 @@ public interface IXjus {
 	}
 
 	public interface ITaskIdxRecordIdRefreshPost extends ISwaggerMethod {
-		public void run(TaskIdxRecordIdRefreshPostRequest req,
-				TaskIdxRecordIdRefreshPostResponse resp) throws Exception;
+		public void run(TaskIdxRecordIdRefreshPostRequest req, TaskIdxRecordIdRefreshPostResponse resp)
+				throws Exception;
 	}
 
 }

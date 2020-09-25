@@ -36,6 +36,8 @@ public interface IPersistence extends Closeable {
 
 	void saveIndexRefreshStatus(IndexRefreshStatus sts);
 
+	void deleteIndexRefreshStatus(IndexRefreshStatus sts);
+
 	default void close() throws IOException {
 	}
 

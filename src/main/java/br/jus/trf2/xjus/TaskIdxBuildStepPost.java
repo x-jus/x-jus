@@ -40,7 +40,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 			int count = queue.getBuildTaskCount();
 			if (count > (MAX_INDEXES + 2 * (idx.getMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxBuild()))) {
 				SwaggerUtils.log(this.getClass())
-						.debug("índice " + req.idx + " - adiando atualização pois há muitas tarefas ativas - " + count);
+						.info("índice " + req.idx + " - adiando atualização pois há muitas tarefas ativas - " + count);
 				return;
 			}
 

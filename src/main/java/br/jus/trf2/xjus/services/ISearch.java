@@ -16,4 +16,6 @@ public interface ISearch {
 			IndexIdxQueryGetResponse resp) throws Exception;
 
 	List<String> getDocumentIds(String indexName, String idStart, int maxRefresh) throws Exception;
+
+	Long count(String idx) throws Exception;
 }

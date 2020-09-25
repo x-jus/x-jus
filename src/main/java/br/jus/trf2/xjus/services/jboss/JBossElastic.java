@@ -19,6 +19,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -28,7 +29,9 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
@@ -58,6 +61,8 @@ import org.elasticsearch.search.sort.SortOrder;
 
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import com.crivano.swaggerservlet.SwaggerUtils;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 import br.jus.trf2.xjus.IXjus.Facet;
@@ -268,6 +273,17 @@ public class JBossElastic implements ISearch {
 	}
 
 	@Override
+	public Long count(String idx) throws Exception {
+		RestClient lowLevelClient = client.getLowLevelClient();
+		Request request = new Request("GET", idx + "/_count");
+		Response response = lowLevelClient.performRequest(request);
+		String json = EntityUtils.toString(response.getEntity());
+		JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+		return jsonObject.get("count").getAsLong();
+
+	}
+
+	@Override
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
 			IndexIdxQueryGetResponse resp) throws Exception {
 		SearchRequest searchRequest = new SearchRequest(idx);
@@ -351,6 +367,7 @@ public class JBossElastic implements ISearch {
 
 		SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
 
+		resp.count = (double) searchResponse.getHits().getTotalHits().value;
 		resp.results = new ArrayList<>();
 		for (SearchHit hit : searchResponse.getHits()) {
 			Record r = new Record();

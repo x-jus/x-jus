@@ -166,6 +166,11 @@ public class Dao implements Closeable, IPersistence {
 		fileSave(filenameRefreshStatus(sts.getIdx()), sts);
 	}
 
+	@Override
+	public void deleteIndexRefreshStatus(IndexRefreshStatus sts) {
+		fileDelete(filenameRefreshStatus(sts.getIdx()));
+	}
+
 	private <T> T fileLoad(String filename, Class<T> clazz) {
 		File file = new File(filename);
 		if (!file.exists())
@@ -174,8 +179,13 @@ public class Dao implements Closeable, IPersistence {
 			if (fis == null)
 				return null;
 			Yaml yaml = new Yaml(new Constructor(clazz)); // add to threadlocal
-			T sts = (T) yaml.load(fis);
-			return sts;
+			try {
+				T sts = (T) yaml.load(fis);
+				return sts;
+			} catch (Exception ex) {
+				file.delete();
+				throw new Exception("Arquivo removido", ex);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Erro lendo " + filename, e);
 		}
@@ -192,6 +202,11 @@ public class Dao implements Closeable, IPersistence {
 		} catch (Exception e) {
 			throw new RuntimeException("Erro gravando " + filename, e);
 		}
+	}
+
+	private void fileDelete(String filename) {
+		File file = new File(filename);
+		file.delete();
 	}
 
 	private String filenameStatus(String idx) {

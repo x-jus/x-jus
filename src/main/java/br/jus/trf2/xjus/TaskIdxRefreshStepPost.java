@@ -46,7 +46,8 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			int count = queue.getRefreshTaskCount();
 			if (count > (MAX_INDEXES
 					+ 2 * (idx.getMaxRefresh() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxRefresh()))) {
-				SwaggerUtils.log(this.getClass()).debug("índice " + idx2 + " - adiando revisão pois há muitas tarefas ativas - " + count);
+				SwaggerUtils.log(this.getClass())
+						.info("índice " + idx2 + " - adiando revisão pois há muitas tarefas ativas - " + count);
 				return;
 			}
 
@@ -62,8 +63,11 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 					.get(30, TimeUnit.SECONDS);
 			AllReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
 
-			if (changedRefs.list == null)
+			if (changedRefs.list == null && changedRefs.list.size() == 0) {
+				SwaggerUtils.log(this.getClass()).info("índice " + idx2 + " - revisão concluída, reiniciando...");
+				dao.deleteIndexRefreshStatus(sts);
 				return;
+			}
 
 			// Add to setNovo all returned IDs
 			TreeSet<String> setNovo = new TreeSet<>();
