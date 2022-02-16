@@ -320,8 +320,12 @@ public class JBossElastic implements ISearch {
 
 		if (facets != null && !facets.trim().isEmpty()) {
 			for (String f : facets.split(",")) {
-				String[] a = f.split(":", 2);
-				boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
+				String[] a = f.split(":", 3);
+				
+				if(a.length == 3)
+					addRangeFilter(a, boolQueryBuilder);								
+				else if(a.length == 2) 
+					boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
 			}
 		}
 
@@ -405,6 +409,22 @@ public class JBossElastic implements ISearch {
 				f.values.add(fv);
 			}
 			resp.facets.add(f);
+		}
+	}
+
+	private void addRangeFilter(String[] a, BoolQueryBuilder boolQueryBuilder) {
+		if(!a[1].trim().isEmpty()) {
+			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
+			   .should(QueryBuilders.rangeQuery(a[0]).gte(a[1]));
+			
+			boolQueryBuilder.filter(rangeStartQuery);
+		}
+		
+		if(!a[2].trim().isEmpty()) {
+			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder()
+			   .should(QueryBuilders.rangeQuery(a[0]).lte(a[2]));
+			
+			boolQueryBuilder.filter(rangeEndQuery);
 		}
 	}
 
