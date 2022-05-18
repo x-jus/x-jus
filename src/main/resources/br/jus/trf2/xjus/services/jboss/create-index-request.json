@@ -45,9 +45,6 @@
 			"title": {
 				"type": "text"
 			},
-			"content": {
-				"type": "text"
-			},
 			"url": {
 				"type": "keyword",
 				"index": false
