@@ -1,35 +1,57 @@
 {
-	"dynamic_templates": [
-		{
-			"facets": {
-				"match": "facet_*",
-				"mapping": {
-					"type": "keyword"
+	"mappings": {
+		"dynamic_templates": [
+			{
+				"facets": {
+					"match": "facet_*",
+					"mapping": {
+						"type": "keyword"
+					}
+				}
+			},
+			{
+				"fields": {
+					"match": "field_*",
+					"mapping": {
+						"type": "text"
+					}
+				}
+			},
+			{
+				"content_field": {
+					"path_match": "content",
+					"mapping": {
+						"norms": false,
+						"type": "text",
+						"index_options": "offsets"
+					},
+					"match_mapping_type": "string"
 				}
 			}
-		}
-	],
-	"properties": {
-		"date": {
-			"type": "date"
-		},
-		"code": {
-			"type": "keyword"
-		},
-		"id": {
-			"type": "keyword"
-		},
-		"acl": {
-			"type": "keyword"
-		},
-		"title": {
-			"type": "text"
-		},
-		"content": {
-			"type": "text"
-		},
-		"url": {
-			"type": "keyword"
+		],
+		"properties": {
+			"date": {
+				"type": "date"
+			},
+			"code": {
+				"type": "keyword"
+			},
+			"id": {
+				"type": "keyword"
+			},
+			"acl": {
+				"type": "keyword"
+			},
+			"title": {
+				"type": "text"
+			},
+			"url": {
+				"type": "keyword",
+				"index": false
+			},
+			"refresh": {
+				"type": "keyword"
+			}
 		}
 	}
 }
