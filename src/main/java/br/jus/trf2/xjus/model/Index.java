@@ -1,11 +1,14 @@
 package br.jus.trf2.xjus.model;
 
-import javax.persistence.Column;
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import br.jus.trf2.xjus.util.Prop;
 
 @Entity
 @Table(name = "index")
@@ -21,7 +24,9 @@ public class Index {
 	private String token;
 	private Boolean active;
 	private Integer maxBuild;
+	private Integer maxBuildNonWorkingHours;
 	private Integer maxRefresh;
+	private Integer maxRefreshNonWorkingHours;
 
 	// Secret to verify the JWT that authenticates the request
 	private String secret;
@@ -82,12 +87,47 @@ public class Index {
 		this.maxBuild = maxBuild;
 	}
 
+	public Integer getMaxBuildNonWorkingHours() {
+		return maxBuildNonWorkingHours;
+	}
+
+	public void setMaxBuildNonWorkingHours(Integer maxBuildNonWorkingHours) {
+		this.maxBuildNonWorkingHours = maxBuildNonWorkingHours;
+	}
+
+	public Integer getCurrentMaxBuild() {
+		if (isNonWorkingHours())
+			return getMaxBuildNonWorkingHours();
+		return getMaxBuild();
+	}
+
+	private boolean isNonWorkingHours() {
+		Date dt = new Date();
+		boolean f = dt.getHours() < Prop.getInt("working.hours.start")
+				|| dt.getHours() >= Prop.getInt("working.hours.end") || dt.getDay() == 0 || dt.getDay() == 6;
+		return f;
+	}
+
 	public Integer getMaxRefresh() {
 		return maxRefresh;
 	}
 
 	public void setMaxRefresh(Integer maxRefresh) {
 		this.maxRefresh = maxRefresh;
+	}
+
+	public Integer getMaxRefreshNonWorkingHours() {
+		return maxRefreshNonWorkingHours;
+	}
+
+	public void setMaxRefreshNonWorkingHours(Integer maxRefreshNonWorkingHours) {
+		this.maxRefreshNonWorkingHours = maxRefreshNonWorkingHours;
+	}
+
+	public Integer getCurrentMaxRefresh() {
+		if (isNonWorkingHours())
+			return getMaxRefreshNonWorkingHours();
+		return getMaxRefresh();
 	}
 
 	public String getSecret() {
@@ -97,4 +137,5 @@ public class Index {
 	public void setSecret(String secret) {
 		this.secret = secret;
 	}
+
 }

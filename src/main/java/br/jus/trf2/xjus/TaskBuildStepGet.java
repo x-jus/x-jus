@@ -23,7 +23,7 @@ public class TaskBuildStepGet implements IXjus.ITaskBuildStepGet {
 		try (IPersistence dao = XjusFactory.getDao()) {
 			List<Index> l = dao.loadIndexes();
 			for (Index idx : l) {
-				if (idx.getActive() && 0 != idx.getMaxBuild()) {
+				if (idx.getActive() && 0 != idx.getCurrentMaxBuild()) {
 					queue.addBuildIndex(idx.getIdx());
 				}
 			}

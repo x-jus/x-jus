@@ -73,6 +73,11 @@ public class Prop {
 			provider.addPrivateProperty("elasticsearch.auth.basic.password");
 		else
 			provider.addPrivateProperty("elasticsearch.auth.basic.password", null);
+		provider.addPublicProperty("elasticsearch.ssl.skip.hostname.verification", "false");
+
+		provider.addPublicProperty("working.hours.start", "8");
+		provider.addPublicProperty("working.hours.end", "17");
+
 		provider.addRestrictedProperty("status.dir", "/var/tmp");
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {
@@ -80,7 +85,11 @@ public class Prop {
 			provider.addPublicProperty("index." + i + ".active", "true");
 			provider.addPublicProperty("index." + i + ".descr", "");
 			provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
+			provider.addPublicProperty("index." + i + ".build.docs.per.min.non.working.hours",
+					provider.getProp("index." + i + ".build.docs.per.min"));
 			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
+			provider.addPublicProperty("index." + i + ".refresh.docs.per.min.non.working.hours",
+					provider.getProp("index." + i + ".refresh.docs.per.min"));
 			provider.addPrivateProperty("index." + i + ".secret");
 			provider.addPrivateProperty("index." + i + ".token");
 			provider.addPublicProperty("index." + i + ".query.json", "{}");

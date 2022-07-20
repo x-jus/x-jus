@@ -38,14 +38,14 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 
 			// Verify the number of tasks in the queue to avoid a fork-bomb
 			int count = queue.getBuildTaskCount();
-			if (count > (MAX_INDEXES + 2 * (idx.getMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxBuild()))) {
+			if (count > (MAX_INDEXES + 2 * (idx.getCurrentMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getCurrentMaxBuild()))) {
 				SwaggerUtils.log(this.getClass())
 						.info("índice " + req.idx + " - adiando atualização pois há muitas tarefas ativas - " + count);
 				return;
 			}
 
 			// Query changed IDs since last update
-			String qs = "?max=" + (idx.getMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getMaxBuild());
+			String qs = "?max=" + (idx.getCurrentMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getCurrentMaxBuild());
 			if (sts != null && sts.getBuildLastdate() != null)
 				qs += "&lastdate=" + SwaggerUtils.format(sts.getBuildLastdate());
 			if (sts != null && sts.getBuildLastid() != null)

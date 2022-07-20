@@ -69,7 +69,9 @@ public class Dao implements Closeable, IPersistence {
 		idx.setActive(Prop.getBool("index." + i + ".active"));
 		idx.setDescr(Prop.get("index." + i + ".descr"));
 		idx.setMaxBuild(Prop.getInt("index." + i + ".build.docs.per.min"));
+		idx.setMaxBuildNonWorkingHours(Prop.getInt("index." + i + ".build.docs.per.min.non.working.hours"));
 		idx.setMaxRefresh(Prop.getInt("index." + i + ".refresh.docs.per.min"));
+		idx.setMaxRefreshNonWorkingHours(Prop.getInt("index." + i + ".refresh.docs.per.min.non.working.hours"));
 		idx.setSecret(Prop.get("index." + i + ".secret"));
 		idx.setToken(Prop.get("index." + i + ".token"));
 		return idx;
