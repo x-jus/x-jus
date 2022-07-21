@@ -38,6 +38,10 @@ public interface IPersistence extends Closeable {
 
 	void deleteIndexRefreshStatus(IndexRefreshStatus sts);
 
+	boolean tryToTouchBuildLock();
+
+	boolean tryToTouchRefreshLock();
+
 	default void close() throws IOException {
 	}
 

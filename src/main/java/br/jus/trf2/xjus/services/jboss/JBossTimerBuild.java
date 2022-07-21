@@ -23,6 +23,9 @@ import javax.sql.DataSource;
 
 import com.crivano.swaggerservlet.SwaggerUtils;
 
+import br.jus.trf2.xjus.XjusFactory;
+import br.jus.trf2.xjus.services.IPersistence;
+
 /**
  * Demonstrates how to use the EJB's @Timeout.
  *
@@ -37,7 +40,10 @@ public class JBossTimerBuild {
 
 	@Timeout
 	public void scheduler(Timer timer) throws Exception {
-		JBossTaskImpl.add("get", "/api/v1/task/build-step");
+		try (IPersistence dao = XjusFactory.getDao()) {
+			if (dao.tryToTouchBuildLock())
+				JBossTaskImpl.add("get", "/api/v1/task/build-step");
+		}
 	}
 
 	@PostConstruct

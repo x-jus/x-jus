@@ -11,6 +11,9 @@ import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 
+import br.jus.trf2.xjus.XjusFactory;
+import br.jus.trf2.xjus.services.IPersistence;
+
 /**
  * Demonstrates how to use the EJB's @Timeout.
  *
@@ -25,7 +28,10 @@ public class JBossTimerRefresh {
 
 	@Timeout
 	public void scheduler(Timer timer) throws Exception {
-		JBossTaskImpl.add("get", "/api/v1/task/refresh-step");
+		try (IPersistence dao = XjusFactory.getDao()) {
+			if (dao.tryToTouchRefreshLock())
+				JBossTaskImpl.add("get", "/api/v1/task/refresh-step");
+		}
 	}
 
 	@PostConstruct

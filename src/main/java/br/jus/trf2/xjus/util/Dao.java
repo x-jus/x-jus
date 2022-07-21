@@ -4,10 +4,15 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +22,8 @@ import javax.persistence.EntityManager;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Tag;
+
+import com.crivano.swaggerservlet.SwaggerUtils;
 
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
@@ -206,6 +213,49 @@ public class Dao implements Closeable, IPersistence {
 		}
 	}
 
+	public boolean tryToTouchBuildLock() {
+		String filename = filenameBuildLock();
+		return tryToTouchLock(filename);
+	}
+
+	public boolean tryToTouchRefreshLock() {
+		String filename = filenameRefreshLock();
+		return tryToTouchLock(filename);
+	}
+
+	private boolean tryToTouchLock(String filename) {
+		Path path = Paths.get(filename);
+
+		try (RandomAccessFile file = new RandomAccessFile(filename, "rw");
+				FileChannel channel = file.getChannel();
+				FileLock lock = channel.tryLock()) {
+			if (lock != null && lock.isValid()) {
+				Long time = null;
+				if (file.length() >= 8)
+					time = file.readLong();
+				Instant now = Instant.now();
+				if (time != null) {
+					Instant lastStart = Instant.ofEpochMilli(time);
+					if (lastStart.plusSeconds(50).isAfter(now)) {
+						SwaggerUtils.log(this.getClass())
+								.info("Outra instância atualizou " + filename + " às " + lastStart.toString());
+						return false;
+					}
+				}
+				file.seek(0L);
+				file.writeLong(now.toEpochMilli());
+				SwaggerUtils.log(this.getClass()).info("Esta instância atualizou " + filename + " às " + now.toString());
+				return true;
+			}
+		} catch (OverlappingFileLockException e) {
+			SwaggerUtils.log(this.getClass()).info("Outra instância bloqueou " + filename);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Erro acessando " + filename, e);
+		}
+		return false;
+	}
+
 	private void fileDelete(String filename) {
 		File file = new File(filename);
 		file.delete();
@@ -221,6 +271,14 @@ public class Dao implements Closeable, IPersistence {
 
 	private String filenameRefreshStatus(String idx) {
 		return Prop.get("status.dir") + "/index-" + idx + "-status-refresh.yaml";
+	}
+
+	private String filenameBuildLock() {
+		return Prop.get("status.dir") + "/lock-build.yaml";
+	}
+
+	private String filenameRefreshLock() {
+		return Prop.get("status.dir") + "/lock-refresh.yaml";
 	}
 
 }
