@@ -20,15 +20,12 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -36,8 +33,9 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.io.stream.BytesStream;
 import org.elasticsearch.common.settings.Settings;
@@ -102,6 +100,10 @@ public class JBossElastic implements ISearch {
 
 		RestHighLevelClient cli = new RestHighLevelClient(builder);
 
+		// Create the Java API Client with the same low level client
+//		ElasticsearchTransport transport = new RestClientTransport(builder.build(), new JacksonJsonpMapper());
+//		ElasticsearchClient esClient = new ElasticsearchClient(transport);
+
 		boolean fConnectException;
 		do {
 			fConnectException = false;
@@ -115,19 +117,32 @@ public class JBossElastic implements ISearch {
 					if (!exists) {
 						// Create index
 						{
-							CreateIndexRequest request = org.elasticsearch.client.Requests.createIndexRequest(idx);
+							CreateIndexRequest request = new CreateIndexRequest(idx);
+							String json = Utils.convertStreamToString(
+									this.getClass().getResourceAsStream("create-index-request.json"));
+							request.source(json, XContentType.JSON);
 							CreateIndexResponse createIndexResponse = cli.indices().create(request,
 									RequestOptions.DEFAULT);
 						}
 
-						try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
-							PutMappingRequest request = new PutMappingRequest(idx);
-							String json = Utils.convertStreamToString(
-									this.getClass().getResourceAsStream("create-index-request.json"));
-							request.source(json, XContentType.JSON);
-							AcknowledgedResponse putMappingResponse = cli.indices().putMapping(request,
-									RequestOptions.DEFAULT);
-						}
+//						try (XContentBuilder jsonBuilder = XContentFactory.jsonBuilder()) {
+//							PutMappingRequest request = new PutMappingRequest(idx);
+//							String json = Utils.convertStreamToString(
+//									this.getClass().getResourceAsStream("create-index-request.json"));
+//							request.source(json, XContentType.JSON);
+//							org.elasticsearch.action.support.master.AcknowledgedResponse putMappingResponse = cli
+//									.indices().putMapping(request, RequestOptions.DEFAULT);
+//						}
+
+						// Create index
+
+						// Nato: Desativado porque parece que vai precisar de uma versão do Elastic
+						// superior a 7.17
+						// por enquanto a criação do índice tem que ser feita na mão, infelizmente.
+//						InputStream json = this.getClass().getResourceAsStream("create-index-request.json");
+//						CreateIndexRequest req = CreateIndexRequest.of(b -> b.index(idx).withJson(json));
+//						boolean created = esClient.indices().create(req).acknowledged();
+
 					} else {
 						// Delete index
 //					try {
@@ -321,10 +336,10 @@ public class JBossElastic implements ISearch {
 		if (facets != null && !facets.trim().isEmpty()) {
 			for (String f : facets.split(",")) {
 				String[] a = f.split(":", 3);
-				
-				if(a.length == 3)
-					addRangeFilter(a, boolQueryBuilder);								
-				else if(a.length == 2) 
+
+				if (a.length == 3)
+					addRangeFilter(a, boolQueryBuilder);
+				else if (a.length == 2)
 					boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
 			}
 		}
@@ -413,17 +428,15 @@ public class JBossElastic implements ISearch {
 	}
 
 	private void addRangeFilter(String[] a, BoolQueryBuilder boolQueryBuilder) {
-		if(!a[1].trim().isEmpty()) {
-			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
-			   .should(QueryBuilders.rangeQuery(a[0]).gte(a[1]));
-			
+		if (!a[1].trim().isEmpty()) {
+			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).gte(a[1]));
+
 			boolQueryBuilder.filter(rangeStartQuery);
 		}
-		
-		if(!a[2].trim().isEmpty()) {
-			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder()
-			   .should(QueryBuilders.rangeQuery(a[0]).lte(a[2]));
-			
+
+		if (!a[2].trim().isEmpty()) {
+			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).lte(a[2]));
+
 			boolQueryBuilder.filter(rangeEndQuery);
 		}
 	}
