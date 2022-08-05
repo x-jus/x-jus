@@ -54,6 +54,10 @@ public class Prop {
 		return Arrays.asList(p.split(","));
 	}
 
+	public static boolean isGovSP() {
+		return "GOVSP".equals(get("/x-jus.local"));
+	}
+
 	public static Date getData(String nome) {
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yy");
 
@@ -94,5 +98,6 @@ public class Prop {
 			provider.addPrivateProperty("index." + i + ".token");
 			provider.addPublicProperty("index." + i + ".query.json", "{}");
 		}
+		provider.addPublicProperty("/x-jus.local", null);
 	}
 }
