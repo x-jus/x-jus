@@ -3,10 +3,10 @@ package br.jus.trf2.xjus.services;
 import java.util.List;
 
 import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.RecordIdGet;
 
 public interface ISearch {
-	void addDocument(String idx, RecordIdGetResponse d) throws Exception;
+	void addDocument(String idx, RecordIdGet.Response d) throws Exception;
 
 	void removeIndex(String idx) throws Exception;
 

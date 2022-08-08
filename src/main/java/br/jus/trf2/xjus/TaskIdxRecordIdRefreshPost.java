@@ -9,8 +9,7 @@ import com.crivano.swaggerservlet.SwaggerUtils;
 import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostResponse;
 import br.jus.trf2.xjus.model.Index;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetRequest;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.RecordIdGet;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ISearch;
 
@@ -28,11 +27,11 @@ public class TaskIdxRecordIdRefreshPost implements IXjus.ITaskIdxRecordIdRefresh
 
 			boolean removed = false;
 			try {
-				SwaggerAsyncResponse<RecordIdGetResponse> recordIdAsync = SwaggerCall
+				SwaggerAsyncResponse<RecordIdGet.Response> recordIdAsync = SwaggerCall
 						.callAsync(getContext(), idx.getToken(), "GET", idx.getApi() + "/record/" + req.id,
-								new RecordIdGetRequest(), RecordIdGetResponse.class)
+								new RecordIdGet.Request(), RecordIdGet.Response.class)
 						.get(30, TimeUnit.SECONDS);
-				RecordIdGetResponse r = recordIdAsync.getRespOrThrowException();
+				RecordIdGet.Response r = recordIdAsync.getRespOrThrowException();
 				if ("REMOVED".equals(r.status)) {
 					removed = true;
 				} else {

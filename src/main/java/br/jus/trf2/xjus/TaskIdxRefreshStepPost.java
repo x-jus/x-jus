@@ -14,8 +14,7 @@ import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexRefreshStatus;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetRequest;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.AllReferencesGetResponse;
+import br.jus.trf2.xjus.record.api.AllReferencesGet;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ISearch;
@@ -56,12 +55,12 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 			if (sts != null && sts.getRefreshLastId() != null)
 				qs += "&lastid=" + sts.getRefreshLastId();
 
-			SwaggerAsyncResponse<AllReferencesGetResponse> changedRefsAsync = SwaggerCall
+			SwaggerAsyncResponse<AllReferencesGet.Response> changedRefsAsync = SwaggerCall
 					.callAsync(getContext(), XjusServlet.getInstance().getProperty("index." + idx.getIdx() + ".token"),
-							"GET", idx.getApi() + "/all-references" + qs, new AllReferencesGetRequest(),
-							AllReferencesGetResponse.class)
+							"GET", idx.getApi() + "/all-references" + qs, new AllReferencesGet.Request(),
+							AllReferencesGet.Response.class)
 					.get(30, TimeUnit.SECONDS);
-			AllReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
+			AllReferencesGet.Response changedRefs = changedRefsAsync.getRespOrThrowException();
 
 			if (changedRefs.list == null && changedRefs.list.size() == 0) {
 				SwaggerUtils.log(this.getClass()).info("índice " + idx2 + " - revisão concluída, reiniciando...");
