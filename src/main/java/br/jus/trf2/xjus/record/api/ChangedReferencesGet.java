@@ -3,16 +3,12 @@ package br.jus.trf2.xjus.record.api;
 import java.sql.Date;
 import java.util.ArrayList;
 
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetRequest;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 
-public class ChangedReferencesGet implements
-		IXjusRecordAPI.IChangedReferencesGet {
+public class ChangedReferencesGet implements IXjusRecordAPI.IChangedReferencesGet {
 
 	@Override
-	public void run(ChangedReferencesGetRequest req,
-			ChangedReferencesGetResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusRecordAPIContext ctx) throws Exception {
 		resp.list = new ArrayList<>();
 		if (req.lastdate == null) {
 			{

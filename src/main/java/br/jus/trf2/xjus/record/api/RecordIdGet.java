@@ -3,13 +3,11 @@ package br.jus.trf2.xjus.record.api;
 import java.util.ArrayList;
 
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Field;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetRequest;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
 
 public class RecordIdGet implements IXjusRecordAPI.IRecordIdGet {
 
 	@Override
-	public void run(RecordIdGetRequest req, RecordIdGetResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusRecordAPIContext ctx) throws Exception {
 		resp.id = req.id;
 		resp.url = "http://teste/" + req.id;
 		resp.acl = "PUBLIC";
@@ -49,7 +47,7 @@ public class RecordIdGet implements IXjusRecordAPI.IRecordIdGet {
 		}
 	}
 
-	public void addField(RecordIdGetResponse resp, String name, String value) {
+	public void addField(RecordIdGet.Response resp, String name, String value) {
 		Field fld = new Field();
 		fld.kind = "TEXT";
 		fld.name = name;
@@ -57,7 +55,7 @@ public class RecordIdGet implements IXjusRecordAPI.IRecordIdGet {
 		resp.field.add(fld);
 	}
 
-	public void addFacet(RecordIdGetResponse resp, String name, String value) {
+	public void addFacet(RecordIdGet.Response resp, String name, String value) {
 		br.jus.trf2.xjus.record.api.IXjusRecordAPI.Facet facet = new br.jus.trf2.xjus.record.api.IXjusRecordAPI.Facet();
 		facet.kind = "KEYWORD";
 		facet.name = name;

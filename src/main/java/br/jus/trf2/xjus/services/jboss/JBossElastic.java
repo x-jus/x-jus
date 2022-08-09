@@ -69,7 +69,7 @@ import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.IXjus.Record;
 import br.jus.trf2.xjus.Utils;
 import br.jus.trf2.xjus.XjusServlet;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.RecordIdGetResponse;
+import br.jus.trf2.xjus.record.api.RecordIdGet;
 import br.jus.trf2.xjus.services.ISearch;
 import br.jus.trf2.xjus.util.Prop;
 
@@ -235,7 +235,7 @@ public class JBossElastic implements ISearch {
 	}
 
 	@Override
-	public void addDocument(String idx, RecordIdGetResponse r) throws Exception {
+	public void addDocument(String idx, RecordIdGet.Response r) throws Exception {
 		XContentBuilder builder = XContentFactory.jsonBuilder();
 		builder.startObject();
 		{

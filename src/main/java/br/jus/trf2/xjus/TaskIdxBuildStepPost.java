@@ -11,8 +11,7 @@ import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostRequest;
 import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetRequest;
-import br.jus.trf2.xjus.record.api.IXjusRecordAPI.ChangedReferencesGetResponse;
+import br.jus.trf2.xjus.record.api.ChangedReferencesGet;
 import br.jus.trf2.xjus.record.api.IXjusRecordAPI.Reference;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ITask;
@@ -50,12 +49,14 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 				qs += "&lastdate=" + SwaggerUtils.format(sts.getBuildLastdate());
 			if (sts != null && sts.getBuildLastid() != null)
 				qs += "&lastid=" + sts.getBuildLastid();
+			if (sts != null && sts.getBuildCursor() != null)
+				qs += "&cursor=" + sts.getBuildCursor();
 
-			SwaggerAsyncResponse<ChangedReferencesGetResponse> changedRefsAsync = SwaggerCall
+			SwaggerAsyncResponse<ChangedReferencesGet.Response> changedRefsAsync = SwaggerCall
 					.callAsync(getContext(), idx.getToken(), "GET", idx.getApi() + "/changed-references" + qs,
-							new ChangedReferencesGetRequest(), ChangedReferencesGetResponse.class)
+							new ChangedReferencesGet.Request(), ChangedReferencesGet.Response.class)
 					.get(30, TimeUnit.SECONDS);
-			ChangedReferencesGetResponse changedRefs = changedRefsAsync.getRespOrThrowException();
+			ChangedReferencesGet.Response changedRefs = changedRefsAsync.getRespOrThrowException();
 
 			if (changedRefs.list == null)
 				return;
@@ -76,6 +77,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 				Reference last = changedRefs.list.get(changedRefs.list.size() - 1);
 				sts.setBuildLastdate(last.date);
 				sts.setBuildLastid(last.id);
+				sts.setBuildCursor(changedRefs.cursor);
 			}
 			sts.setBuildLastCount(changedRefs.list.size());
 			sts.setBuildRecords(sts.getBuildRecords() + sts.getBuildLastCount());
