@@ -344,13 +344,14 @@ public class JBossElastic implements ISearch {
 			}
 		}
 
+
 		if (acl == null)
 			acl = "PUBLIC";
-		String[] acls = acl.split(";");
+		String[] acls = ( !Prop.isGovSP() ) ? acl.split(";") : new String[]{ };
 		for (String s : acls) {
 			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
 		}
-		boolQueryBuilder.minimumShouldMatch(1);
+		boolQueryBuilder.minimumShouldMatch(( !Prop.isGovSP() ) ? 1 : 0);
 		searchSourceBuilder.query(boolQueryBuilder);
 
 		searchRequest.source(searchSourceBuilder);
