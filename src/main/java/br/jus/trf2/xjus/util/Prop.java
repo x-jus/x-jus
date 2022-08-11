@@ -84,20 +84,34 @@ public class Prop {
 
 		provider.addRestrictedProperty("status.dir", "/var/tmp");
 		provider.addPublicProperty("indexes");
+		provider.addPublicProperty("/x-jus.local", null);
 		for (String i : getList("indexes")) {
 			provider.addRestrictedProperty("index." + i + ".api");
-			provider.addPublicProperty("index." + i + ".active", "true");
+			
+			/* Ativando indexação caso não seja GovSP */
+			if (!isGovSP()) {
+				provider.addPublicProperty("index." + i + ".active", "true");
+				provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
+				provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
+			} else {
+				/* 
+				* Desativando indexação caso seja GovSP. 
+				* Nesse caso o processo de indexação será realizado externamente pelo Logstash. 
+				* O XJUS passará a atuar somente na pesquisa da base previamente indexada. 
+				* */
+				provider.addPublicProperty("index." + i + ".active", "false");
+				provider.addPublicProperty("index." + i + ".build.docs.per.min", "0");
+				provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "0");
+			}
+
 			provider.addPublicProperty("index." + i + ".descr", "");
-			provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
 			provider.addPublicProperty("index." + i + ".build.docs.per.min.non.working.hours",
 					provider.getProp("index." + i + ".build.docs.per.min"));
-			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
 			provider.addPublicProperty("index." + i + ".refresh.docs.per.min.non.working.hours",
 					provider.getProp("index." + i + ".refresh.docs.per.min"));
 			provider.addPrivateProperty("index." + i + ".secret");
 			provider.addPrivateProperty("index." + i + ".token");
 			provider.addPublicProperty("index." + i + ".query.json", "{}");
 		}
-		provider.addPublicProperty("/x-jus.local", null);
 	}
 }
