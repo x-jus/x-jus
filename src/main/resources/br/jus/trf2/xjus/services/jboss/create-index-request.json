@@ -33,6 +33,9 @@
 			"date": {
 				"type": "date"
 			},
+			"field_data": {
+				"type": "date"
+			},
 			"code": {
 				"type": "keyword"
 			},
