@@ -357,11 +357,11 @@ public class JBossElastic implements ISearch {
         
 		if (acl == null)
 			acl = "PUBLIC";
-		String[] acls = ( !Prop.isGovSP() ) ? acl.split(";") : new String[]{ };
+		String[] acls = Prop.getBool("verify.acls") ? acl.split(";") : new String[]{ };
 		for (String s : acls) {
 			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
 		}
-		boolQueryBuilder.minimumShouldMatch(( !Prop.isGovSP() ) ? 1 : 0);
+		boolQueryBuilder.minimumShouldMatch(Prop.getBool("verify.acls") ? 1 : 0);
 		searchSourceBuilder.query(boolQueryBuilder);
 
 		searchRequest.source(searchSourceBuilder);
