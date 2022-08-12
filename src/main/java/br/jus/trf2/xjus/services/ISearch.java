@@ -15,6 +15,9 @@ public interface ISearch {
 	void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
 			IndexIdxQueryGetResponse resp) throws Exception;
 
+	void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl, 
+			   String fromDate, String toDate, IndexIdxQueryGetResponse resp) throws Exception;
+
 	List<String> getDocumentIds(String indexName, String idStart, int maxRefresh) throws Exception;
 
 	Long count(String idx) throws Exception;

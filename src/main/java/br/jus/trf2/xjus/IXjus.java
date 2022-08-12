@@ -164,6 +164,8 @@ public interface IXjus {
 		public String page;
 		public String perpage;
 		public String acl;
+		public String fromDate;
+		public String toDate;
 	}
 
 	public class IndexIdxQueryGetResponse implements ISwaggerResponse {
