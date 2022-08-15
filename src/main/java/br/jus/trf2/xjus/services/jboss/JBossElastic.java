@@ -6,10 +6,7 @@ import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.PreDestroy;
 
@@ -299,8 +296,13 @@ public class JBossElastic implements ISearch {
 	}
 
 	@Override
+	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl, IndexIdxQueryGetResponse resp) throws Exception {
+		this.query(idx, filter, facets, page, perpage, acl, null, null, resp);
+	}
+	
+	@Override
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
-			IndexIdxQueryGetResponse resp) throws Exception {
+					  String fromDate, String toDate, IndexIdxQueryGetResponse resp) throws Exception {
 		SearchRequest searchRequest = new SearchRequest(idx);
 
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -333,24 +335,34 @@ public class JBossElastic implements ISearch {
 		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 		boolQueryBuilder.must(new QueryStringQueryBuilder(filter));
 
-		if (facets != null && !facets.trim().isEmpty()) {
-			for (String f : facets.split(",")) {
-				String[] a = f.split(":", 3);
+        if (facets != null && !facets.trim().isEmpty()) {
+            for (String f : facets.split(",")) {
+                String[] a = f.split(":", 2);
 
-				if (a.length == 3)
-					addRangeFilter(a, boolQueryBuilder);
-				else if (a.length == 2)
-					boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
-			}
+                boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
+            }
+        }
+
+        if (fromDate != null && !fromDate.trim().isEmpty()) {
+            BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
+					.should(QueryBuilders.rangeQuery("date").from(fromDate));
+			boolQueryBuilder.filter(rangeStartQuery);
+        }
+
+		if (toDate != null && !toDate.trim().isEmpty()) {
+			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder()
+					.should(QueryBuilders.rangeQuery("date").to(toDate));
+			boolQueryBuilder.filter(rangeEndQuery);
 		}
-
+        
 		if (acl == null)
 			acl = "PUBLIC";
-		String[] acls = acl.split(";");
+		/* Caso propriedade verify.acls esteja com false, a verificação das ACLs será ignorada na pesquisa */
+		String[] acls = Prop.getBool("verify.acls") ? acl.split(";") : new String[]{ };
 		for (String s : acls) {
 			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
 		}
-		boolQueryBuilder.minimumShouldMatch(1);
+		boolQueryBuilder.minimumShouldMatch(Prop.getBool("verify.acls") ? 1 : 0);
 		searchSourceBuilder.query(boolQueryBuilder);
 
 		searchRequest.source(searchSourceBuilder);

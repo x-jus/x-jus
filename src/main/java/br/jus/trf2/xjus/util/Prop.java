@@ -80,14 +80,20 @@ public class Prop {
 
 		provider.addRestrictedProperty("status.dir", "/var/tmp");
 		provider.addPublicProperty("indexes");
+		/* Adição da propriedade verify.acls para configuração se as ACLs serão verificadas ou não na pesquisa 
+		* Caso propriedade verify.acls esteja com false, a verificação das ACLs será ignorada na pesquisa
+		* */
+		provider.addPublicProperty("verify.acls", "true");
 		for (String i : getList("indexes")) {
 			provider.addRestrictedProperty("index." + i + ".api");
+
 			provider.addPublicProperty("index." + i + ".active", "true");
-			provider.addPublicProperty("index." + i + ".descr", "");
 			provider.addPublicProperty("index." + i + ".build.docs.per.min", "10");
+			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
+
+			provider.addPublicProperty("index." + i + ".descr", "");
 			provider.addPublicProperty("index." + i + ".build.docs.per.min.non.working.hours",
 					provider.getProp("index." + i + ".build.docs.per.min"));
-			provider.addPublicProperty("index." + i + ".refresh.docs.per.min", "5");
 			provider.addPublicProperty("index." + i + ".refresh.docs.per.min.non.working.hours",
 					provider.getProp("index." + i + ".refresh.docs.per.min"));
 			provider.addPrivateProperty("index." + i + ".secret");
