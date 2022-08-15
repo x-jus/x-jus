@@ -357,6 +357,7 @@ public class JBossElastic implements ISearch {
         
 		if (acl == null)
 			acl = "PUBLIC";
+		/* Caso propriedade verify.acls esteja com false, a verificação das ACLs será ignorada na pesquisa */
 		String[] acls = Prop.getBool("verify.acls") ? acl.split(";") : new String[]{ };
 		for (String s : acls) {
 			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
