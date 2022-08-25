@@ -188,7 +188,10 @@ public interface IXjus {
 		public Double buildCount;
 		public String buildLastId;
 		public Date buildLastDate;
+		public String buildCursor;
+		public int buildQueuedTaskCount;
 		public String refreshLastId;
+		public int refreshQueuedTaskCount;
 	}
 
 	public interface IIndexIdxStatusGet extends ISwaggerMethod {

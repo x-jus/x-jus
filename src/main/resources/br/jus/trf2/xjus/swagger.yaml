@@ -92,8 +92,14 @@ paths:
                 $ref: "#/definitions/LastId"
               buildLastDate:
                 $ref: "#/definitions/LastDate"
+              buildCursor:
+                $ref: "#/definitions/Cursor"
+              buildQueuedTaskCount:
+                $ref: "#/definitions/Count"
               refreshLastId:
                 $ref: "#/definitions/LastId"
+              refreshQueuedTaskCount:
+                $ref: "#/definitions/Count"
         500:
           description: Error ocurred
           schema:
@@ -470,6 +476,10 @@ definitions:
     description: Última ID que foi indexada
     type: string      
     example: 0000001
+  Cursor:
+    description: Cursor para retomar a indexação do último ponto
+    type: string      
+    example: 0000001-1/0000002-2
   Timestamp:
     description: Data e hora da última indexação
     type: string
