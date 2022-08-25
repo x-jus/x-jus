@@ -48,6 +48,9 @@ paths:
         - $ref: "#/parameters/facets"
         - $ref: "#/parameters/page"
         - $ref: "#/parameters/perpage"
+        - $ref: "#/parameters/fromDate"
+        - $ref: "#/parameters/toDate"
+        - $ref: "#/parameters/code"
         - $ref: "#/parameters/acl"
       responses:
         200:
@@ -273,6 +276,24 @@ parameters:
     description: Quantidade de itens por página.
     required: true
     type: string
+  fromDate:
+    name: fromDate
+    in: query
+    description: Intervalo de data inicial.
+    required: false
+    type: string
+  toDate:
+    name:   toDate
+    in: query
+    description: Intervalo de data final.
+    required: false
+    type: string
+  code:
+    name: code
+    in: query
+    description: Código que contenha nos itens pesquisados.
+    required: false
+    type: string  
   acl:
     name: acl
     in: query

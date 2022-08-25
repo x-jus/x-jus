@@ -69,7 +69,7 @@ public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 				}
 			}
 
-			search.query(req.idx, req.filter, req.facets, page, perpage, acl, req.fromDate, req.toDate, resp);
+			search.query(req.idx, req.filter, req.facets, page, perpage, acl, req.code, req.fromDate, req.toDate, resp);
 		}
 
 	}
