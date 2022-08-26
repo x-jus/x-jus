@@ -6,7 +6,10 @@ import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PreDestroy;
 
@@ -62,8 +65,8 @@ import com.google.gson.stream.JsonReader;
 
 import br.jus.trf2.xjus.IXjus.Facet;
 import br.jus.trf2.xjus.IXjus.FacetValue;
-import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.IXjus.Record;
+import br.jus.trf2.xjus.IndexIdxQueryGet;
 import br.jus.trf2.xjus.Utils;
 import br.jus.trf2.xjus.XjusServlet;
 import br.jus.trf2.xjus.record.api.RecordIdGet;
@@ -296,13 +299,14 @@ public class JBossElastic implements ISearch {
 	}
 
 	@Override
-	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl, IndexIdxQueryGetResponse resp) throws Exception {
+	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
+			IndexIdxQueryGet.Response resp) throws Exception {
 		this.query(idx, filter, facets, page, perpage, acl, null, null, null, resp);
 	}
-	
+
 	@Override
-	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
-					  String code, String fromDate, String toDate, IndexIdxQueryGetResponse resp) throws Exception {
+	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl, String code,
+			String fromDate, String toDate, IndexIdxQueryGet.Response resp) throws Exception {
 		SearchRequest searchRequest = new SearchRequest(idx);
 
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -335,36 +339,38 @@ public class JBossElastic implements ISearch {
 		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 		boolQueryBuilder.must(new QueryStringQueryBuilder(filter));
 
-        if (facets != null && !facets.trim().isEmpty()) {
-            for (String f : facets.split(",")) {
-                String[] a = f.split(":", 2);
+		if (facets != null && !facets.trim().isEmpty()) {
+			for (String f : facets.split(",")) {
+				String[] a = f.split(":", 2);
 
-                boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
-            }
-        }
+				boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
+			}
+		}
 
 		if (code != null && !code.trim().isEmpty()) {
 			QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder("*" + code);
 			queryStringQueryBuilder.defaultField("code");
 			boolQueryBuilder.filter(queryStringQueryBuilder);
 		}
-		
-        if (fromDate != null && !fromDate.trim().isEmpty()) {
-            BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
+
+		if (fromDate != null && !fromDate.trim().isEmpty()) {
+			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
 					.should(QueryBuilders.rangeQuery("date").from(fromDate));
 			boolQueryBuilder.filter(rangeStartQuery);
-        }
+		}
 
 		if (toDate != null && !toDate.trim().isEmpty()) {
-			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder()
-					.should(QueryBuilders.rangeQuery("date").to(toDate));
+			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery("date").to(toDate));
 			boolQueryBuilder.filter(rangeEndQuery);
 		}
-        
+
 		if (acl == null)
 			acl = "PUBLIC";
-		/* Caso propriedade verify.acls esteja com false, a verificação das ACLs será ignorada na pesquisa */
-		String[] acls = Prop.getBool("verify.acls") ? acl.split(";") : new String[]{ };
+		/*
+		 * Caso propriedade verify.acls esteja com false, a verificação das ACLs será
+		 * ignorada na pesquisa
+		 */
+		String[] acls = Prop.getBool("verify.acls") ? acl.split(";") : new String[] {};
 		for (String s : acls) {
 			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
 		}

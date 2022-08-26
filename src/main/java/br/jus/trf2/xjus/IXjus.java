@@ -1,5 +1,6 @@
 package br.jus.trf2.xjus;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,91 +10,94 @@ import com.crivano.swaggerservlet.ISwaggerRequest;
 import com.crivano.swaggerservlet.ISwaggerResponse;
 
 public interface IXjus {
-	public class Id implements ISwaggerModel {
+	public static class Id implements ISwaggerModel {
 	}
 
-	public class Name implements ISwaggerModel {
+	public static class Name implements ISwaggerModel {
 	}
 
-	public class Object implements ISwaggerModel {
+	public static class Object implements ISwaggerModel {
 	}
 
-	public class Acl implements ISwaggerModel {
+	public static class Acl implements ISwaggerModel {
 	}
 
-	public class Refresh implements ISwaggerModel {
+	public static class Refresh implements ISwaggerModel {
 	}
 
-	public class Url implements ISwaggerModel {
+	public static class Url implements ISwaggerModel {
 	}
 
-	public class Code implements ISwaggerModel {
+	public static class Code implements ISwaggerModel {
 	}
 
-	public class Title implements ISwaggerModel {
+	public static class Title implements ISwaggerModel {
 	}
 
-	public class Content implements ISwaggerModel {
+	public static class Content implements ISwaggerModel {
 	}
 
-	public class Snippet implements ISwaggerModel {
+	public static class Snippet implements ISwaggerModel {
 	}
 
-	public class Idx implements ISwaggerModel {
+	public static class Idx implements ISwaggerModel {
 	}
 
-	public class Descr implements ISwaggerModel {
+	public static class Descr implements ISwaggerModel {
 	}
 
-	public class Api implements ISwaggerModel {
+	public static class Api implements ISwaggerModel {
 	}
 
-	public class Token implements ISwaggerModel {
+	public static class Token implements ISwaggerModel {
 	}
 
-	public class Active implements ISwaggerModel {
+	public static class Active implements ISwaggerModel {
 	}
 
-	public class MaxBuild implements ISwaggerModel {
+	public static class MaxBuild implements ISwaggerModel {
 	}
 
-	public class MaxRefresh implements ISwaggerModel {
+	public static class MaxRefresh implements ISwaggerModel {
 	}
 
-	public class Secret implements ISwaggerModel {
+	public static class Secret implements ISwaggerModel {
 	}
 
-	public class Records implements ISwaggerModel {
+	public static class Records implements ISwaggerModel {
 	}
 
-	public class LastDate implements ISwaggerModel {
+	public static class LastDate implements ISwaggerModel {
 	}
 
-	public class LastId implements ISwaggerModel {
+	public static class LastId implements ISwaggerModel {
 	}
 
-	public class Timestamp implements ISwaggerModel {
+	public static class Cursor implements ISwaggerModel {
 	}
 
-	public class Status implements ISwaggerModel {
+	public static class Timestamp implements ISwaggerModel {
 	}
 
-	public class Count implements ISwaggerModel {
+	public static class Status implements ISwaggerModel {
 	}
 
-	public class Complete implements ISwaggerModel {
+	public static class Count implements ISwaggerModel {
 	}
 
-	public class RefinementToken implements ISwaggerModel {
+	public static class Complete implements ISwaggerModel {
 	}
 
-	public class Field implements ISwaggerModel {
+	public static class RefinementToken implements ISwaggerModel {
+	}
+
+	public static class Field implements ISwaggerModel {
 		public String name;
 		public String kind;
 		public String value;
 	}
 
-	public class SearchIndex implements ISwaggerModel {
+	public static class SearchIndex implements ISwaggerModel {
 		public String idx;
 		public String descr;
 		public String api;
@@ -112,18 +116,18 @@ public interface IXjus {
 		public Boolean refreshComplete;
 	}
 
-	public class Facet implements ISwaggerModel {
+	public static class Facet implements ISwaggerModel {
 		public String name;
-		public List<FacetValue> values;
+		public List<FacetValue> values = new ArrayList<>();
 	}
 
-	public class FacetValue implements ISwaggerModel {
+	public static class FacetValue implements ISwaggerModel {
 		public String name;
 		public Double count;
 		public String refinementToken;
 	}
 
-	public class Record implements ISwaggerModel {
+	public static class Record implements ISwaggerModel {
 		public String id;
 		public String object;
 		public String acl;
@@ -132,164 +136,163 @@ public interface IXjus {
 		public String code;
 		public String title;
 		public String content;
-		public List<Field> field;
+		public List<Field> field = new ArrayList<>();
 	}
 
-	public class User implements ISwaggerModel {
+	public static class User implements ISwaggerModel {
 		public String gmail;
 		public Boolean admin;
 		public String loginUrl;
 		public String logoutUrl;
 	}
 
-	public class Error implements ISwaggerModel {
+	public static class Error implements ISwaggerModel {
 		public String errormsg;
 	}
 
-	public class UserGetRequest implements ISwaggerRequest {
-	}
-
-	public class UserGetResponse implements ISwaggerResponse {
-		public User user;
-	}
-
 	public interface IUserGet extends ISwaggerMethod {
-		public void run(UserGetRequest req, UserGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+		}
 
-	public class IndexIdxQueryGetRequest implements ISwaggerRequest {
-		public String idx;
-		public String filter;
-		public String facets;
-		public String page;
-		public String perpage;
-		public String acl;
-		public String code;
-		public String fromDate;
-		public String toDate;
-	}
+		public static class Response implements ISwaggerResponse {
+			public User user;
+		}
 
-	public class IndexIdxQueryGetResponse implements ISwaggerResponse {
-		public Double count;
-		public List<Facet> facets;
-		public List<Record> results;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface IIndexIdxQueryGet extends ISwaggerMethod {
-		public void run(IndexIdxQueryGetRequest req, IndexIdxQueryGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+			public String filter;
+			public String facets;
+			public String page;
+			public String perpage;
+			public String fromDate;
+			public String toDate;
+			public String code;
+			public String acl;
+		}
 
-	public class IndexIdxStatusGetRequest implements ISwaggerRequest {
-		public String idx;
-	}
+		public static class Response implements ISwaggerResponse {
+			public Double count;
+			public List<Facet> facets = new ArrayList<>();
+			public List<Record> results = new ArrayList<>();
+		}
 
-	public class IndexIdxStatusGetResponse implements ISwaggerResponse {
-		public Double count;
-		public Double buildCount;
-		public String buildLastId;
-		public Date buildLastDate;
-		public String buildCursor;
-		public int buildQueuedTaskCount;
-		public String refreshLastId;
-		public int refreshQueuedTaskCount;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface IIndexIdxStatusGet extends ISwaggerMethod {
-		public void run(IndexIdxStatusGetRequest req, IndexIdxStatusGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+		}
 
-	public class IndexIdxRecordIdGetRequest implements ISwaggerRequest {
-		public String idx;
-		public String id;
-	}
+		public static class Response implements ISwaggerResponse {
+			public Double count;
+			public Double buildCount;
+			public String buildLastId;
+			public Date buildLastDate;
+			public String buildCursor;
+			public Double buildQueuedTaskCount;
+			public String refreshLastId;
+			public Double refreshQueuedTaskCount;
+		}
 
-	public class IndexIdxRecordIdGetResponse implements ISwaggerResponse {
-		public String id;
-		public String object;
-		public String acl;
-		public String refresh;
-		public String url;
-		public String code;
-		public String title;
-		public String content;
-		public List<Field> field;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface IIndexIdxRecordIdGet extends ISwaggerMethod {
-		public void run(IndexIdxRecordIdGetRequest req, IndexIdxRecordIdGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+			public String id;
+		}
 
-	public class IndexIdxRecordPostRequest implements ISwaggerRequest {
-		public String idx;
-	}
+		public static class Response implements ISwaggerResponse {
+			public String id;
+			public String object;
+			public String acl;
+			public String refresh;
+			public String url;
+			public String code;
+			public String title;
+			public String content;
+			public List<Field> field = new ArrayList<>();
+		}
 
-	public class IndexIdxRecordPostResponse implements ISwaggerResponse {
-		public String id;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface IIndexIdxRecordPost extends ISwaggerMethod {
-		public void run(IndexIdxRecordPostRequest req, IndexIdxRecordPostResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+		}
 
-	public class TaskBuildStepGetRequest implements ISwaggerRequest {
-	}
+		public static class Response implements ISwaggerResponse {
+			public String id;
+		}
 
-	public class TaskBuildStepGetResponse implements ISwaggerResponse {
-		public String status;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface ITaskBuildStepGet extends ISwaggerMethod {
-		public void run(TaskBuildStepGetRequest req, TaskBuildStepGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+		}
 
-	public class TaskIdxBuildStepPostRequest implements ISwaggerRequest {
-		public String idx;
-	}
+		public static class Response implements ISwaggerResponse {
+			public String status;
+		}
 
-	public class TaskIdxBuildStepPostResponse implements ISwaggerResponse {
-		public String status;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface ITaskIdxBuildStepPost extends ISwaggerMethod {
-		public void run(TaskIdxBuildStepPostRequest req, TaskIdxBuildStepPostResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+		}
 
-	public class TaskRefreshStepGetRequest implements ISwaggerRequest {
-	}
+		public static class Response implements ISwaggerResponse {
+			public String status;
+		}
 
-	public class TaskRefreshStepGetResponse implements ISwaggerResponse {
-		public String status;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface ITaskRefreshStepGet extends ISwaggerMethod {
-		public void run(TaskRefreshStepGetRequest req, TaskRefreshStepGetResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+		}
 
-	public class TaskIdxRefreshStepPostRequest implements ISwaggerRequest {
-		public String idx;
-	}
+		public static class Response implements ISwaggerResponse {
+			public String status;
+		}
 
-	public class TaskIdxRefreshStepPostResponse implements ISwaggerResponse {
-		public String status;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface ITaskIdxRefreshStepPost extends ISwaggerMethod {
-		public void run(TaskIdxRefreshStepPostRequest req, TaskIdxRefreshStepPostResponse resp) throws Exception;
-	}
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+		}
 
-	public class TaskIdxRecordIdRefreshPostRequest implements ISwaggerRequest {
-		public String idx;
-		public String id;
-		public Boolean sync;
-	}
+		public static class Response implements ISwaggerResponse {
+			public String status;
+		}
 
-	public class TaskIdxRecordIdRefreshPostResponse implements ISwaggerResponse {
-		public String id;
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 	public interface ITaskIdxRecordIdRefreshPost extends ISwaggerMethod {
-		public void run(TaskIdxRecordIdRefreshPostRequest req, TaskIdxRecordIdRefreshPostResponse resp)
-				throws Exception;
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+			public String id;
+			public Boolean sync;
+		}
+
+		public static class Response implements ISwaggerResponse {
+			public String id;
+		}
+
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
 }

@@ -10,8 +10,6 @@ import com.crivano.swaggerservlet.SwaggerAsyncResponse;
 import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerUtils;
 
-import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostRequest;
-import br.jus.trf2.xjus.IXjus.TaskIdxRefreshStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexRefreshStatus;
 import br.jus.trf2.xjus.record.api.AllReferencesGet;
@@ -25,7 +23,7 @@ public class TaskIdxRefreshStepPost implements IXjus.ITaskIdxRefreshStepPost {
 	private static final int MAX_INDEXES = 100; // Probably not more than 100
 
 	@Override
-	public void run(TaskIdxRefreshStepPostRequest req, TaskIdxRefreshStepPostResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusContext ctx) throws Exception {
 		resp.status = "OK";
 
 		ITask queue = XjusFactory.getQueue();

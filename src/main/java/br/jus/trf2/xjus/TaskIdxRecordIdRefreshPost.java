@@ -6,8 +6,6 @@ import com.crivano.swaggerservlet.SwaggerAsyncResponse;
 import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerUtils;
 
-import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostRequest;
-import br.jus.trf2.xjus.IXjus.TaskIdxRecordIdRefreshPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.record.api.RecordIdGet;
 import br.jus.trf2.xjus.services.IPersistence;
@@ -15,7 +13,7 @@ import br.jus.trf2.xjus.services.ISearch;
 
 public class TaskIdxRecordIdRefreshPost implements IXjus.ITaskIdxRecordIdRefreshPost {
 	@Override
-	public void run(TaskIdxRecordIdRefreshPostRequest req, TaskIdxRecordIdRefreshPostResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusContext ctx) throws Exception {
 		SwaggerUtils.log(this.getClass()).debug("índice " + req.idx + " - registro " + req.id + " - buscando");
 
 		ISearch search = XjusFactory.getSearch();
