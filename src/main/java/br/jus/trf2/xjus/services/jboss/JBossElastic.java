@@ -297,12 +297,12 @@ public class JBossElastic implements ISearch {
 
 	@Override
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl, IndexIdxQueryGetResponse resp) throws Exception {
-		this.query(idx, filter, facets, page, perpage, acl, null, null, resp);
+		this.query(idx, filter, facets, page, perpage, acl, null, null, null, resp);
 	}
 	
 	@Override
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
-					  String fromDate, String toDate, IndexIdxQueryGetResponse resp) throws Exception {
+					  String code, String fromDate, String toDate, IndexIdxQueryGetResponse resp) throws Exception {
 		SearchRequest searchRequest = new SearchRequest(idx);
 
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -343,6 +343,12 @@ public class JBossElastic implements ISearch {
             }
         }
 
+		if (code != null && !code.trim().isEmpty()) {
+			QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder("*" + code);
+			queryStringQueryBuilder.defaultField("code");
+			boolQueryBuilder.filter(queryStringQueryBuilder);
+		}
+		
         if (fromDate != null && !fromDate.trim().isEmpty()) {
             BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder()
 					.should(QueryBuilders.rangeQuery("date").from(fromDate));
