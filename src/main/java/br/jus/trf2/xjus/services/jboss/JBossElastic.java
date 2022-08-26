@@ -346,7 +346,7 @@ public class JBossElastic implements ISearch {
 		if (code != null && !code.trim().isEmpty()) {
 			QueryStringQueryBuilder queryStringQueryBuilder = new QueryStringQueryBuilder("*" + code);
 			queryStringQueryBuilder.defaultField("code");
-			boolQueryBuilder.must(queryStringQueryBuilder);
+			boolQueryBuilder.filter(queryStringQueryBuilder);
 		}
 		
         if (fromDate != null && !fromDate.trim().isEmpty()) {
