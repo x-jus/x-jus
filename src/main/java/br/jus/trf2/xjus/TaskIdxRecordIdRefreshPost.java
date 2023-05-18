@@ -16,7 +16,7 @@ import br.jus.trf2.xjus.services.ISearch;
 public class TaskIdxRecordIdRefreshPost implements IXjus.ITaskIdxRecordIdRefreshPost {
 	@Override
 	public void run(TaskIdxRecordIdRefreshPostRequest req, TaskIdxRecordIdRefreshPostResponse resp) throws Exception {
-		SwaggerUtils.log(this.getClass()).debug("índice " + req.idx + " - registro " + req.id + " - buscando");
+		SwaggerUtils.log(this.getClass()).info("índice " + req.idx + " - registro " + req.id + " - buscando");
 
 		ISearch search = XjusFactory.getSearch();
 
@@ -37,7 +37,7 @@ public class TaskIdxRecordIdRefreshPost implements IXjus.ITaskIdxRecordIdRefresh
 				} else {
 					search.addDocument(idx.getIdx(), r);
 					SwaggerUtils.log(this.getClass())
-							.debug("índice " + req.idx + " - registro " + req.id + " - gravado");
+							.info("índice " + req.idx + " - registro " + req.id + " - gravado");
 				}
 			} catch (Exception ex) {
 				if ("REMOVED".equals(ex.getMessage()))
@@ -45,7 +45,7 @@ public class TaskIdxRecordIdRefreshPost implements IXjus.ITaskIdxRecordIdRefresh
 			}
 			if (removed) {
 				search.removeDocument(req.idx, req.id);
-				SwaggerUtils.log(this.getClass()).debug("índice " + req.idx + " - registro " + req.id + " - removido");
+				SwaggerUtils.log(this.getClass()).info("índice " + req.idx + " - registro " + req.id + " - removido");
 			}
 		}
 	}

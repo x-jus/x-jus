@@ -12,13 +12,18 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
+import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -93,6 +98,18 @@ public class JBossElastic implements ISearch {
 			builder.setHttpClientConfigCallback(new HttpClientConfigCallback() {
 				@Override
 				public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+					if (Prop.getBool("elasticsearch.ssl.skip.hostname.verification")) {
+						try {
+							SSLContextBuilder sslBuilder = SSLContexts.custom().loadTrustMaterial(null,
+									(x509Certificates, s) -> true);
+							final SSLContext sslContext = sslBuilder.build();
+							// httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+							httpClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true);
+							httpClientBuilder.setSSLContext(sslContext);
+						} catch (Exception ex) {
+							throw new RuntimeException("Não foi possível desabilitar a verificação de SSL", ex);
+						}
+					}
 					return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 				}
 			});
