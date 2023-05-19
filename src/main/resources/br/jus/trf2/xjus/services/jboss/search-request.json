@@ -1,0 +1,155 @@
+{
+	"from": 0,
+	"size": __MAX_RESULTS__,
+	"query": {
+		"bool": {
+			"must": [
+				{
+					"query_string": {
+						"query": "__QUERY_STRING__",
+						"fields": [],
+						"type": "best_fields",
+						"default_operator": "or",
+						"max_determinized_states": 10000,
+						"enable_position_increments": true,
+						"fuzziness": "AUTO",
+						"fuzzy_prefix_length": 0,
+						"fuzzy_max_expansions": 50,
+						"phrase_slop": 0,
+						"escape": false,
+						"auto_generate_synonyms_phrase_query": true,
+						"fuzzy_transpositions": true,
+						"boost": 1.0
+					}
+				}
+			],
+			"should": [__ACL__],
+			"adjust_pure_negative": true,
+			"minimum_should_match": "1",
+			"boost": 1.0
+		}
+	},
+	"_source": {
+		"includes": [
+			"acl",
+			"url",
+			"code",
+			"title"
+		],
+		"excludes": []
+	},
+	"aggregations": {
+		"orgao": {
+			"meta": {
+				"field": "facet_orgao",
+				"title": "Órgão"
+			},
+			"terms": {
+				"field": "facet_orgao",
+				"size": 10,
+				"min_doc_count": 1,
+				"shard_min_doc_count": 0,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_count": "desc"
+					},
+					{
+						"_key": "asc"
+					}
+				]
+			}
+		},
+		"origem": {
+			"meta": {
+				"field": "facet_origem",
+				"title": "Origem"
+			},
+			"terms": {
+				"field": "facet_origem",
+				"size": 10,
+				"min_doc_count": 1,
+				"shard_min_doc_count": 0,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_count": "desc"
+					},
+					{
+						"_key": "asc"
+					}
+				]
+			}
+		},
+		"especie": {
+			"meta": {
+				"field": "facet_especie",
+				"title": "Espécie"
+			},
+			"terms": {
+				"field": "facet_especie",
+				"size": 10,
+				"min_doc_count": 1,
+				"shard_min_doc_count": 0,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_count": "desc"
+					},
+					{
+						"_key": "asc"
+					}
+				]
+			}
+		},
+		"modelo": {
+			"meta": {
+				"field": "facet_modelo",
+				"title": "Modelo"
+			},
+			"terms": {
+				"field": "facet_modelo",
+				"size": 10,
+				"min_doc_count": 1,
+				"shard_min_doc_count": 0,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_count": "desc"
+					},
+					{
+						"_key": "asc"
+					}
+				]
+			}
+		},
+		"subscritor_lotacao": {
+			"meta": {
+				"field": "facet_subscritor_lotacao",
+				"title": "Lotação do Subscritor"
+			},
+			"terms": {
+				"field": "facet_subscritor_lotacao",
+				"size": 10,
+				"min_doc_count": 1,
+				"shard_min_doc_count": 0,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_count": "desc"
+					},
+					{
+						"_key": "asc"
+					}
+				]
+			}
+		}
+	},
+	"highlight": {
+		"fields": {
+			"content": {
+				"type": "unified"
+			}
+		}
+	}
+}
