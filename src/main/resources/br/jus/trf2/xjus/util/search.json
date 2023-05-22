@@ -21,8 +21,7 @@
 						"fuzzy_transpositions": true,
 						"boost": 1.0
 					}
-				}
-				,"__FACETS__"
+				},"__FACETS__"
 			],
 			"should": "__ACLS__",
 			"minimum_should_match": "1",
@@ -145,6 +144,11 @@
 			"content": {
 				"type": "unified"
 			}
+		}
+	},
+	"sort": {
+		"dateref": {
+			"order": "desc"
 		}
 	}
 }

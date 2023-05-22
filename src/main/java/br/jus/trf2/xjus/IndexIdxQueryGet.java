@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.crivano.swaggerservlet.SwaggerServlet;
 
 import br.jus.trf2.xjus.model.Index;
@@ -41,21 +42,21 @@ public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 				if (jwt != null) {
 					if (jwt.startsWith("Bearer "))
 						jwt = jwt.substring(7);
-					Map<String, Object> jwtMap = Utils.jwtVerify(jwt, idx.getSecret());
-					String jwtAcl = (String) jwtMap.get("acl");
+					Map<String, Claim> jwtMap = Utils.jwtVerify(jwt, idx.getSecret());
+					Claim jwtAcl = (Claim) jwtMap.get("acl");
 					if (jwtAcl != null) {
 						// It would be great to filter the requested ACL so that it
 						// conforms to the
 						if (acl != null) {
 							String[] splitReq = acl.split(";");
-							List<String> splitJwt = Arrays.asList(jwtAcl.split(";"));
+							List<String> splitJwt = Arrays.asList(jwtAcl.asString().split(";"));
 							for (String s : splitReq) {
 								if (!splitJwt.contains(s))
 									throw new Exception("Acesso requisitado '" + s
 											+ "' não está presente no cabeçalho de autorização '" + jwtAcl + "'");
 							}
 						} else
-							acl = jwtAcl;
+							acl = jwtAcl.asString();
 					} else
 						acl = "PUBLIC";
 				} else {

@@ -4,7 +4,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class Utils {
 	public static byte[] calcSha1(byte[] content) {
@@ -61,11 +65,12 @@ public class Utils {
 		return s.trim();
 	}
 
-	public static Map<String, Object> jwtVerify(String token, String secret) {
-		final JWTVerifier verifier = new JWTVerifier(secret);
+	public static Map<String, Claim> jwtVerify(String token, String secret) {
 		try {
-			Map<String, Object> map = verifier.verify(token);
-			return map;
+		    Algorithm algorithm = Algorithm.HMAC256(secret);
+		    JWTVerifier verifier = JWT.require(algorithm).build();
+		    DecodedJWT decodedJWT = verifier.verify(token);
+		    return decodedJWT.getClaims();
 		} catch (Exception e) {
 			throw new RuntimeException("Erro ao verificar token JWT", e);
 		}

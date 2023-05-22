@@ -51,6 +51,9 @@
 			},
 			"refresh": {
 				"type": "keyword"
+			},
+			"sort": {
+				"type": "keyword"
 			}
 		}
 	}

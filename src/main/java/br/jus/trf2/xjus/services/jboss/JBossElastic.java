@@ -31,7 +31,6 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 
-import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import com.crivano.swaggerservlet.SwaggerUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -53,7 +52,6 @@ public class JBossElastic implements ISearch {
 	public static ISearch INSTANCE;
 //	private RestHighLevelClient client;
 	private RestClient lowLevelClient;
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public void initialize() throws URISyntaxException {
 		INSTANCE = this;
@@ -152,6 +150,7 @@ public class JBossElastic implements ISearch {
 			builder.addProperty("content", r.content);
 		builder.addProperty("code", r.code);
 		builder.addProperty("url", r.url);
+		builder.addProperty("dateref", r.dateref);
 
 		if (r.title != null)
 			builder.addProperty("title", r.title);
