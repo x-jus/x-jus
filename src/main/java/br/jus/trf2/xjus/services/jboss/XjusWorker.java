@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
@@ -31,7 +32,11 @@ public class XjusWorker implements MessageListener {
 				if (o instanceof JbossMessage) {
 					JbossMessage msg = (JbossMessage) o;
 					LOGGER.fine("received Message from queue");
-					XjusServlet.getInstance().execute(msg.method, msg.pathInfo, null);
+					try {
+						XjusServlet.getInstance().execute(msg.method, msg.pathInfo, null);
+					} catch (Exception ex) {
+						throw new RuntimeException("Erro executando " + msg.method + ": " + msg.pathInfo, ex);
+					}
 				}
 			} else {
 				LOGGER.warning("Message of wrong type: " + rcvMessage.getClass().getName());

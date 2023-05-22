@@ -1,20 +1,21 @@
 package br.jus.trf2.xjus.services.jboss;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.ConnectException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
 import javax.annotation.PreDestroy;
 import javax.net.ssl.SSLContext;
-import javax.xml.soap.Text;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.RequestLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -24,52 +25,34 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback;
 
 import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
-import com.auth0.jwt.internal.org.bouncycastle.util.Strings;
 import com.crivano.swaggerservlet.SwaggerUtils;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.JsonPrimitive;
 
 import br.jus.trf2.xjus.IXjus.Facet;
 import br.jus.trf2.xjus.IXjus.FacetValue;
-import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
+import br.jus.trf2.xjus.IXjus.IIndexIdxQueryGet;
 import br.jus.trf2.xjus.IXjus.Record;
 import br.jus.trf2.xjus.XjusServlet;
 import br.jus.trf2.xjus.record.api.RecordIdGet;
 import br.jus.trf2.xjus.services.ISearch;
 import br.jus.trf2.xjus.util.Prop;
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregate;
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import co.elastic.clients.elasticsearch.core.DeleteRequest;
-import co.elastic.clients.elasticsearch.core.DeleteResponse;
-import co.elastic.clients.elasticsearch.core.IndexRequest;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.elasticsearch.transform.Settings;
-import co.elastic.clients.json.jackson.JacksonJsonpMapper;
-import co.elastic.clients.transport.ElasticsearchTransport;
-import co.elastic.clients.transport.rest_client.RestClientTransport;
 
 public class JBossElastic implements ISearch {
 
 	public static ISearch INSTANCE;
 //	private RestHighLevelClient client;
 	private RestClient lowLevelClient;
-	private ElasticsearchClient esc;
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	public void initialize() throws URISyntaxException {
@@ -93,7 +76,6 @@ public class JBossElastic implements ISearch {
 							SSLContextBuilder sslBuilder = SSLContexts.custom().loadTrustMaterial(null,
 									(x509Certificates, s) -> true);
 							final SSLContext sslContext = sslBuilder.build();
-							// httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
 							httpClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true);
 							httpClientBuilder.setSSLContext(sslContext);
 						} catch (Exception ex) {
@@ -107,47 +89,33 @@ public class JBossElastic implements ISearch {
 
 		lowLevelClient = builderH.build();
 
-		// Create the transport with a Jackson mapper
-		ElasticsearchTransport transport = new RestClientTransport(lowLevelClient, new JacksonJsonpMapper());
-
-		// And create the API client
-		ElasticsearchClient esc = new ElasticsearchClient(transport);
-
 		boolean fConnectException;
 		do {
 			fConnectException = false;
 			try {
 				for (String idx : Prop.getList("indexes")) {
 
-					boolean exists = esc.indices().exists(ExistsRequest.of(e -> e.index(idx))).value();
-					SwaggerUtils.log(this.getClass())
-							.info("Conexão com o ElasticSearch em " + Prop.get("elasticsearch.url") + " OK.");
-					if (!exists) {
+					try {
+						fetch("HEAD", idx);
+						SwaggerUtils.log(this.getClass()).info("Conectado com o ElasticSearch.");
+					} catch (NoSuchElementException ex) {
 						// Create index
-						InputStream json = this.getClass().getResourceAsStream("create-index-request.json");
-						CreateIndexRequest req = CreateIndexRequest.of(b -> b.index(idx).withJson(json));
-						boolean created = esc.indices().create(req).acknowledged();
-					} else {
-						// Delete index
-//					try {
-//						DeleteIndexRequest request = new DeleteIndexRequest(idx);
-//						AcknowledgedResponse deleteIndexResponse = cli.indices().delete(request, RequestOptions.DEFAULT);
-//					} catch (Exception ex) {
-//						SwaggerUtils.log(this.getClass()).warn("Não consegui remover o índice", ex);
-//					}
+						JsonObject jo = (JsonObject) new JsonParser().parse(Prop.get("index." + idx + ".create.json"));
+						JsonObject resp = fetch("PUT", idx, jo);
+						String result = resp.get("result").getAsString();
+						if (!"created".equals(result))
+							throw new RuntimeException("Erro criando índice no ElastiSearch: " + idx);
+						SwaggerUtils.log(this.getClass()).info("Criado índice " + idx + " no ElasticSearch.");
 					}
-
 				}
-			} catch (ConnectException ex) {
-				SwaggerUtils.log(this.getClass()).info("Não foi possível conectar com o ElasticSearch em "
-						+ Prop.get("elasticsearch.url") + ", tentando novamente em 5 segundos.");
+			} catch (Exception ex) {
+				SwaggerUtils.log(this.getClass())
+						.info("Não foi possível conectar com o ElasticSearch, tentando novamente em 5 segundos.", ex);
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 				}
 				fConnectException = true;
-			} catch (Exception ex) {
-				throw new RuntimeException(ex);
 			}
 		} while (fConnectException);
 	}
@@ -170,7 +138,7 @@ public class JBossElastic implements ISearch {
 	@PreDestroy
 	public void stop() {
 		try {
-			esc._transport().close();
+			lowLevelClient.close();
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -211,16 +179,14 @@ public class JBossElastic implements ISearch {
 			}
 		}
 
-		builder.addProperty("date", SwaggerUtils.format(new Date()));
+		builder.addProperty("date", SwaggerUtils.dateAdapter.format(new Date()));
 
-		String json = builder.getAsString();
-		System.out.println(json);
+		JsonObject resp = fetch("PUT", idx + "/_doc/" + r.id, builder);
 
-		IndexRequest request = IndexRequest.of(i -> i.index(idx).id(r.id).withJson(new StringReader(json)));
-		IndexResponse response = esc.index(request);
-
-//		IndexRequest request = new IndexRequest(idx).id(r.id).source(builder);
-//		IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+		String result = resp.get("result").getAsString();
+		if (!"created".equals(result) && !"updated".equals(result)) {
+			throw new RuntimeException("Erro criando documento no ElastiSearch: " + r.id);
+		}
 	}
 
 	@Override
@@ -230,8 +196,11 @@ public class JBossElastic implements ISearch {
 
 	@Override
 	public void removeDocument(String idx, String id) throws Exception {
-		DeleteRequest request = DeleteRequest.of(i -> i.index(idx).id(id));
-		DeleteResponse deleteResponse = esc.delete(request);
+		try {
+			fetch("DELETE", idx + "/_doc/" + id);
+		} catch (NoSuchElementException ex) {
+			// swallow delete exception when document is already deleted
+		}
 	}
 
 	@Override
@@ -245,113 +214,71 @@ public class JBossElastic implements ISearch {
 
 	@Override
 	public void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
-			IndexIdxQueryGetResponse resp) throws Exception {
-	
+			IIndexIdxQueryGet.Response resp) throws Exception {
 
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		SearchModule searchModule = new SearchModule(Settings.EMPTY, false, Collections.emptyList());
-		try (XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(
-				new NamedXContentRegistry(searchModule.getNamedXContents()), null,
-				XjusServlet.getInstance().getProperty("index." + idx + ".query.json"))) {
-			searchSourceBuilder.parseXContent(parser);
-		}
+		String json = XjusServlet.getInstance().getProperty("index." + idx + ".query.json");
 
-		// SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//		searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-//		MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("user", "kimchy");
-//		searchSourceBuilder.query(matchQueryBuilder);
+		json = json.replace("\"__QUERY_STRING__\"", new JsonPrimitive(filter).toString());
 
-		// This is necessary to output facets in the same order that they are defined in
-		// the .query.json property
-		List<String> facetNames = new ArrayList<>();
-		try (StringReader sr = new StringReader(searchSourceBuilder.aggregations().toString());
-				JsonReader reader = new JsonReader(sr)) {
-			reader.beginObject();
-			while (reader.hasNext()) {
-				String name = reader.nextName();
-				facetNames.add(name);
-				reader.skipValue();
-			}
-			reader.endObject();
-		}
-
-		BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-		boolQueryBuilder.must(new QueryStringQueryBuilder(filter));
-
+		// Facets
+		//
+		String sFacets = "";
 		if (facets != null && !facets.trim().isEmpty()) {
 			for (String f : facets.split(",")) {
 				String[] a = f.split(":", 3);
 
-				if (a.length == 3)
-					addRangeFilter(a, boolQueryBuilder);
-				else if (a.length == 2)
-					boolQueryBuilder.must(new TermQueryBuilder(a[0], a[1]));
-			}
-		}
-		
-		JsonArray acl = new JsonArray();
-		
-
-		{
-			"term": {
-				"acl": {
-					"value": "PUBLIC",
-					"boost": 1.0
+				if (a.length == 3) {
+//					addRangeFilter(a, boolQueryBuilder);
+				} else if (a.length == 2) {
+					JsonObject o = new JsonObject();
+					JsonObject oterm = new JsonObject();
+					o.add("term", oterm);
+					JsonObject ofacet = new JsonObject();
+					oterm.add(a[0], ofacet);
+					ofacet.addProperty("value", a[1]);
+					ofacet.addProperty("boost", 1.0);
+					sFacets += "," + o.toString();
 				}
 			}
 		}
+		json = json.replace(",\"__FACETS__\"", sFacets);
 
-
+		// ACL
+		//
 		if (acl == null)
 			acl = "PUBLIC";
 		String[] acls = acl.split(";");
+		String sacls = "";
+		JsonArray aacls = new JsonArray();
 		for (String s : acls) {
-			boolQueryBuilder.should(new TermQueryBuilder("acl", s));
+			JsonObject o = new JsonObject();
+			JsonObject oterm = new JsonObject();
+			o.add("term", oterm);
+			JsonObject oacl = new JsonObject();
+			oterm.add("acl", oacl);
+			oacl.addProperty("value", s);
+			oacl.addProperty("boost", 1.0);
+			aacls.add(o);
 		}
-		boolQueryBuilder.minimumShouldMatch(1);
-		searchSourceBuilder.query(boolQueryBuilder);
+		json = json.replace("\"__ACLS__\"", aacls.toString());
 
+		// Max per Page and Offset
 		int offset = 0;
 		if (page != null && perpage != null) {
 			offset = (page - 1) * perpage;
 		}
+		json = json.replace("\"__FIRST_RESULT__\"", "" + offset);
+		json = json.replace("\"__MAX_RESULTS__\"", "" + perpage);
 
-		String[] includeFields = new String[] { "acl", "url", "code", "title" };
-		String[] excludeFields = new String[] {};
-		searchSourceBuilder.fetchSource(includeFields, excludeFields);
+		JsonObject esresp = fetch("GET", "/" + idx + "/_search", json);
 
-		HighlightBuilder highlightBuilder = new HighlightBuilder();
-		HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field("content");
-		highlightTitle.highlighterType("unified");
-		highlightBuilder.field(highlightTitle);
-		searchSourceBuilder.highlighter(highlightBuilder);
-
-		searchSourceBuilder.from(offset);
-		searchSourceBuilder.size(perpage);
-
-		String json = Strings.toString(searchSourceBuilder);
-		System.out.println(json);
-
-		SearchRequest searchRequest = SearchRequest.of(i -> i.index(idx).withJson(new StringReader(json)));
-
-//
-//		System.err.println(b.string());
-//
-//		searchSourceBuilder.toXContent(builder, params);
-
-//		if (facets != null) {
-//			String[] a = facets.split(",");
-//			for (String f : a)
-//				queryBuilder.addFacetRefinementFromToken(f);
-//		}
-
-		SearchResponse searchResponse = esc.search(searchRequest, null);
-
-		resp.count = (double) searchResponse.hits().total().value();
+		resp.count = esresp.getAsJsonObject("hits").getAsJsonObject("total").get("value").getAsDouble();
 		resp.results = new ArrayList<>();
-		for (co.elastic.clients.elasticsearch.core.search.Hit hit : (List<Hit>) searchResponse.hits().hits()) {
+		for (JsonElement hitElement : esresp.getAsJsonObject("hits").getAsJsonArray("hits")) {
+			JsonObject hit = hitElement.getAsJsonObject();
+			JsonObject src = hit.get("_source").getAsJsonObject();
 			Record r = new Record();
-			r.id = hit.id();
+			r.id = hit.get("_id").getAsString();
 			// r.object;
 			r.acl = array(hit, "acl");
 //			r.refresh;
@@ -363,76 +290,77 @@ public class JBossElastic implements ISearch {
 			resp.results.add(r);
 		}
 
+		JsonObject facetNames = esresp.getAsJsonObject("aggregations");
 		resp.facets = new ArrayList<>();
-		for (String agg : facetNames) {
+		for (Entry<String, JsonElement> agg : facetNames.entrySet()) {
 			Facet f = new Facet();
-			Aggregate g = searchResponse.aggregations().get(agg);
-
-			String name = g.getName();
+			String name = agg.getKey();
+			JsonObject v = agg.getValue().getAsJsonObject();
 			f.name = name;
-			if (g.getMetadata() != null && g.getMetadata().get("title") != null)
-				f.name = g.getMetadata().get("title").toString();
+			if (v.get("meta") != null && v.get("meta").getAsJsonObject().get("title") != null)
+				f.name = v.get("meta").getAsJsonObject().get("title").getAsString();
 			f.values = new ArrayList<>();
 
-			for (Bucket bucket : g.getBuckets()) {
+			for (JsonElement bucket : v.get("buckets").getAsJsonArray()) {
+				JsonObject b = bucket.getAsJsonObject();
 				FacetValue fv = new FacetValue();
-				fv.name = bucket.getKeyAsString();
-				fv.count = (double) bucket.getDocCount();
+				fv.name = b.get("key").getAsString();
+				fv.count = b.get("doc_count").getAsDouble();
 				String field = name;
-				if (g.getMetadata() != null && g.getMetadata().get("field") != null)
-					field = g.getMetadata().get("field").toString();
-				fv.refinementToken = field + ":" + bucket.getKeyAsString();
+				if (v.get("meta") != null && v.get("meta").getAsJsonObject().get("field") != null)
+					field = v.get("meta").getAsJsonObject().get("field").getAsString();
+				fv.refinementToken = field + ":" + fv.name;
 				f.values.add(fv);
 			}
 			resp.facets.add(f);
 		}
 	}
 
-	private void addRangeFilter(String[] a, BoolQueryBuilder boolQueryBuilder) {
-		if (!a[1].trim().isEmpty()) {
-			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).gte(a[1]));
+//	private void addRangeFilter(String[] a, BoolQueryBuilder boolQueryBuilder) {
+//		if (!a[1].trim().isEmpty()) {
+//			BoolQueryBuilder rangeStartQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).gte(a[1]));
+//
+//			boolQueryBuilder.filter(rangeStartQuery);
+//		}
+//
+//		if (!a[2].trim().isEmpty()) {
+//			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).lte(a[2]));
+//
+//			boolQueryBuilder.filter(rangeEndQuery);
+//		}
+//	}
 
-			boolQueryBuilder.filter(rangeStartQuery);
-		}
-
-		if (!a[2].trim().isEmpty()) {
-			BoolQueryBuilder rangeEndQuery = new BoolQueryBuilder().should(QueryBuilders.rangeQuery(a[0]).lte(a[2]));
-
-			boolQueryBuilder.filter(rangeEndQuery);
-		}
-	}
-
-	private String value(Hit hit, String field) {
-		String f = (String) hit.fields().get(field);
+	private String value(JsonObject hit, String field) {
+		String f = (String) hit.get("_source").getAsJsonObject().get(field).getAsString();
 		if (f == null)
 			return null;
 		return f;
 	}
 
-	private String array(Hit hit, String field) {
+	private String array(JsonObject hit, String field) {
 		StringBuilder sb = new StringBuilder();
-		List<String> f = (List<String>) hit.fields().get(field);
+		JsonArray f = hit.get("_source").getAsJsonObject().get(field).getAsJsonArray();
 		if (f == null)
 			return null;
-		for (String o : f) {
+		for (JsonElement o : f) {
 			if (sb.length() > 0)
 				sb.append(";");
-			sb.append(o.toString());
+			sb.append(o.getAsString());
 		}
 		return sb.toString();
 	}
 
-	private String highlights(Hit hit, String field) {
-		if (hit == null || hit.highlight() == null || hit.highlight().get(field) == null)
+	private String highlights(JsonObject hit, String field) {
+		if (hit.get("highlight") == null || hit.get("highlight").getAsJsonObject().get("content") == null)
 			return null;
-		Text[] fragments = hit.highlight().get(field).fragments();
+		JsonArray fragments = hit.get("highlight").getAsJsonObject().get("content").getAsJsonArray();
 		if (fragments == null)
 			return null;
 		StringBuilder sb = new StringBuilder();
-		for (Text o : fragments) {
+		for (JsonElement o : fragments) {
 			if (sb.length() > 0)
 				sb.append(" ... ");
-			sb.append(o.string());
+			sb.append(o.getAsString());
 		}
 		return sb.toString();
 	}
@@ -440,34 +368,68 @@ public class JBossElastic implements ISearch {
 	@Override
 	public List<String> getDocumentIds(String idx, String startId, int count) throws Exception {
 
-		SearchRequest searchRequest = new SearchRequest(idx);
-		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-		searchSourceBuilder.query(QueryBuilders.rangeQuery("id").from(startId).includeLower(false));
-//		MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder("user", "kimchy");
-//		searchSourceBuilder.query(matchQueryBuilder);
+		String json = XjusServlet.getInstance().getProperty("index." + idx + ".list.ids.json");
 
-		String[] includeFields = new String[] {};
-		String[] excludeFields = new String[] {};
-		searchSourceBuilder.fetchSource(includeFields, excludeFields);
+		json = json.replace("\"__MAX_RESULTS__\"", "" + count);
+		json = json.replace("__START_ID__", startId);
 
-		searchSourceBuilder.sort("id", SortOrder.ASC);
-		searchSourceBuilder.size(count);
-		searchRequest.source(searchSourceBuilder);
-
-		SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+		JsonObject esresp = fetch("GET", "/" + idx + "/_search", json);
 
 		List<String> docIds = new ArrayList<>();
-		String id = startId;
 		int i = 0;
-
-		for (SearchHit hit : searchResponse.getHits()) {
-			id = hit.getId();
-			docIds.add(id);
+		for (JsonElement hitElement : esresp.getAsJsonObject("hits").getAsJsonArray("hits")) {
+			JsonObject hit = hitElement.getAsJsonObject();
+			Record r = new Record();
+			docIds.add(hit.get("_id").getAsString());
 			i++;
 			if (count <= i)
 				break;
 		}
 		return docIds;
+	}
+
+	private JsonObject fetch(String method, String path) {
+		return fetch(method, path, (JsonObject) null);
+	}
+
+	private JsonObject fetch(String method, String path, String body) {
+		JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
+		return fetch(method, path, jsonObject);
+	}
+
+	private JsonObject fetch(String method, String path, JsonObject body) {
+		Request request = new Request(method, path);
+		if (body != null)
+			request.setJsonEntity(body.toString());
+		Response response;
+		try {
+			response = lowLevelClient.performRequest(request);
+		} catch (ResponseException e) {
+			if (e.getResponse().getStatusLine().getStatusCode() == 404)
+				throw new NoSuchElementException();
+			throw new RuntimeException("Erro reportado pelo Elasticsearch", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Erro reportado pelo Elasticsearch", e);
+		}
+		RequestLine requestLine = response.getRequestLine();
+		HttpHost host = response.getHost();
+		int statusCode = response.getStatusLine().getStatusCode();
+
+		if ("HEAD".equals(method) && statusCode == 404)
+			throw new NoSuchElementException();
+
+		Header[] headers = response.getHeaders();
+		String responseBody;
+		try {
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				responseBody = EntityUtils.toString(entity);
+				return new JsonParser().parse(responseBody).getAsJsonObject();
+			}
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException("Erro convertendo resultado do Elasticsearch", e);
+		}
 	}
 
 }

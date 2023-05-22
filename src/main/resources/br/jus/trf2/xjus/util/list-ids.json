@@ -1,0 +1,19 @@
+{
+  "from": 0,
+  "size": "__MAX_RESULTS__",
+  "query": {
+    "range": {
+      "id": {
+        "gt": "__START_ID__"
+      }
+    }
+  },
+  "_source": {
+    "excludes": ["*"]
+  },
+  "sort": {
+    "id": {
+      "order": "asc"
+    }
+  }
+}

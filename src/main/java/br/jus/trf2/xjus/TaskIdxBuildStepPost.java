@@ -7,8 +7,6 @@ import com.crivano.swaggerservlet.SwaggerAsyncResponse;
 import com.crivano.swaggerservlet.SwaggerCall;
 import com.crivano.swaggerservlet.SwaggerUtils;
 
-import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostRequest;
-import br.jus.trf2.xjus.IXjus.TaskIdxBuildStepPostResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
 import br.jus.trf2.xjus.record.api.ChangedReferencesGet;
@@ -21,7 +19,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 	private static final int MAX_INDEXES = 100; // Probably not more than 100
 
 	@Override
-	public void run(TaskIdxBuildStepPostRequest req, TaskIdxBuildStepPostResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusContext ctx) throws Exception {
 		resp.status = "OK";
 
 		ITask queue = XjusFactory.getQueue();
@@ -46,7 +44,7 @@ public class TaskIdxBuildStepPost implements IXjus.ITaskIdxBuildStepPost {
 			// Query changed IDs since last update
 			String qs = "?max=" + (idx.getCurrentMaxBuild() == null ? MAX_PER_MINUTE_DEFAULT : idx.getCurrentMaxBuild());
 			if (sts != null && sts.getBuildLastdate() != null)
-				qs += "&lastdate=" + SwaggerUtils.format(sts.getBuildLastdate());
+				qs += "&lastdate=" + SwaggerUtils.dateAdapter.format(sts.getBuildLastdate());
 			if (sts != null && sts.getBuildLastid() != null)
 				qs += "&lastid=" + sts.getBuildLastid();
 			if (sts != null && sts.getBuildCursor() != null)

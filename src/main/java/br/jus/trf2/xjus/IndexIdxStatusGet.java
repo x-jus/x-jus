@@ -2,8 +2,6 @@ package br.jus.trf2.xjus;
 
 import javax.enterprise.context.RequestScoped;
 
-import br.jus.trf2.xjus.IXjus.IndexIdxStatusGetRequest;
-import br.jus.trf2.xjus.IXjus.IndexIdxStatusGetResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.model.IndexBuildStatus;
 import br.jus.trf2.xjus.model.IndexRefreshStatus;
@@ -14,7 +12,7 @@ import br.jus.trf2.xjus.services.ISearch;
 public class IndexIdxStatusGet implements IXjus.IIndexIdxStatusGet {
 
 	@Override
-	public void run(IndexIdxStatusGetRequest req, IndexIdxStatusGetResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusContext ctx) throws Exception {
 		ISearch search = XjusFactory.getSearch();
 
 		try (IPersistence dao = XjusFactory.getDao()) {

@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import br.jus.trf2.xjus.Utils;
+
 public class Prop {
 	public interface IPropertyProvider {
 		String getProp(String nome);
@@ -92,7 +94,12 @@ public class Prop {
 					provider.getProp("index." + i + ".refresh.docs.per.min"));
 			provider.addPrivateProperty("index." + i + ".secret");
 			provider.addPrivateProperty("index." + i + ".token");
-			provider.addPublicProperty("index." + i + ".query.json", "{}");
+			provider.addPublicProperty("index." + i + ".create.json",
+					Utils.convertStreamToString(Prop.class.getResourceAsStream("create-index.json")));
+			provider.addPublicProperty("index." + i + ".query.json",
+					Utils.convertStreamToString(Prop.class.getResourceAsStream("search.json")));
+			provider.addPublicProperty("index." + i + ".list.ids.json",
+					Utils.convertStreamToString(Prop.class.getResourceAsStream("list-ids.json")));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 {
-	"from": 0,
-	"size": __MAX_RESULTS__,
+	"from": "__FIRST_RESULT__",
+	"size": "__MAX_RESULTS__",
 	"query": {
 		"bool": {
 			"must": [
@@ -22,9 +22,9 @@
 						"boost": 1.0
 					}
 				}
+				,"__FACETS__"
 			],
-			"should": [__ACL__],
-			"adjust_pure_negative": true,
+			"should": "__ACLS__",
 			"minimum_should_match": "1",
 			"boost": 1.0
 		}
@@ -48,7 +48,6 @@
 				"field": "facet_orgao",
 				"size": 10,
 				"min_doc_count": 1,
-				"shard_min_doc_count": 0,
 				"show_term_doc_count_error": false,
 				"order": [
 					{
@@ -69,7 +68,6 @@
 				"field": "facet_origem",
 				"size": 10,
 				"min_doc_count": 1,
-				"shard_min_doc_count": 0,
 				"show_term_doc_count_error": false,
 				"order": [
 					{
@@ -90,7 +88,6 @@
 				"field": "facet_especie",
 				"size": 10,
 				"min_doc_count": 1,
-				"shard_min_doc_count": 0,
 				"show_term_doc_count_error": false,
 				"order": [
 					{
@@ -111,7 +108,6 @@
 				"field": "facet_modelo",
 				"size": 10,
 				"min_doc_count": 1,
-				"shard_min_doc_count": 0,
 				"show_term_doc_count_error": false,
 				"order": [
 					{
@@ -132,7 +128,6 @@
 				"field": "facet_subscritor_lotacao",
 				"size": 10,
 				"min_doc_count": 1,
-				"shard_min_doc_count": 0,
 				"show_term_doc_count_error": false,
 				"order": [
 					{

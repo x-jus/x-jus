@@ -8,8 +8,6 @@ import javax.enterprise.context.RequestScoped;
 
 import com.crivano.swaggerservlet.SwaggerServlet;
 
-import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetRequest;
-import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
 import br.jus.trf2.xjus.model.Index;
 import br.jus.trf2.xjus.services.IPersistence;
 import br.jus.trf2.xjus.services.ISearch;
@@ -18,7 +16,7 @@ import br.jus.trf2.xjus.services.ISearch;
 public class IndexIdxQueryGet implements IXjus.IIndexIdxQueryGet {
 
 	@Override
-	public void run(IndexIdxQueryGetRequest req, IndexIdxQueryGetResponse resp) throws Exception {
+	public void run(Request req, Response resp, XjusContext ctx) throws Exception {
 		Integer page = req.page != null ? Integer.valueOf(req.page) : null;
 		Integer perpage = req.perpage != null ? Integer.valueOf(req.perpage) : null;
 

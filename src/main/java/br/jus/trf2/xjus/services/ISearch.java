@@ -2,7 +2,7 @@ package br.jus.trf2.xjus.services;
 
 import java.util.List;
 
-import br.jus.trf2.xjus.IXjus.IndexIdxQueryGetResponse;
+import br.jus.trf2.xjus.IXjus.IIndexIdxQueryGet;
 import br.jus.trf2.xjus.record.api.RecordIdGet;
 
 public interface ISearch {
@@ -13,7 +13,7 @@ public interface ISearch {
 	void removeDocument(String idx, String id) throws Exception;
 
 	void query(String idx, String filter, String facets, Integer page, Integer perpage, String acl,
-			IndexIdxQueryGetResponse resp) throws Exception;
+			IIndexIdxQueryGet.Response resp) throws Exception;
 
 	List<String> getDocumentIds(String indexName, String idStart, int maxRefresh) throws Exception;
 
