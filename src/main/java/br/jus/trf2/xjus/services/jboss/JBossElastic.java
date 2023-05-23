@@ -370,7 +370,7 @@ public class JBossElastic implements ISearch {
 		String json = XjusServlet.getInstance().getProperty("index." + idx + ".list.ids.json");
 
 		json = json.replace("\"__MAX_RESULTS__\"", "" + count);
-		json = json.replace("__START_ID__", startId);
+		json = json.replace("__START_ID__", startId != null ? startId : "");
 
 		JsonObject esresp = fetch("GET", "/" + idx + "/_search", json);
 
