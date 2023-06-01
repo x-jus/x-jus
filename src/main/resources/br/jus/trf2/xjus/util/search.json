@@ -9,7 +9,7 @@
 						"query": "__QUERY_STRING__",
 						"fields": [],
 						"type": "best_fields",
-						"default_operator": "or",
+						"default_operator": "and",
 						"max_determinized_states": 10000,
 						"enable_position_increments": true,
 						"fuzziness": "AUTO",
@@ -134,6 +134,23 @@
 					},
 					{
 						"_key": "asc"
+					}
+				]
+			}
+		},
+		"ano": {
+			"meta": {
+				"field": "facet_ano",
+				"title": "Ano"
+			},
+			"terms": {
+				"field": "facet_ano",
+				"size": 10,
+				"min_doc_count": 1,
+				"show_term_doc_count_error": false,
+				"order": [
+					{
+						"_key": "desc"
 					}
 				]
 			}
