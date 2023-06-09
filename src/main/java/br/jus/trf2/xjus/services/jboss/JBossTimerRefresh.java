@@ -12,7 +12,9 @@ import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
 
 import br.jus.trf2.xjus.XjusFactory;
+import br.jus.trf2.xjus.XjusServlet;
 import br.jus.trf2.xjus.services.IPersistence;
+import br.jus.trf2.xjus.util.Prop;
 
 /**
  * Demonstrates how to use the EJB's @Timeout.
@@ -36,10 +38,27 @@ public class JBossTimerRefresh {
 
 	@PostConstruct
 	public void initialize() {
-		ScheduleExpression se = new ScheduleExpression();
-		// Set schedule to every 60 seconds (starting at second 0 of every minute).
-		se.hour("*").minute("*").second("0/60");
-		timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
+		Runnable r = new StartTimer();
+		Thread th = new Thread(r, "Start-Timer-Refresh");
+		th.start();
+	}
+
+	private class StartTimer implements Runnable {
+		public void run() {
+			while (XjusServlet.getInstance() == null) {
+				System.out.println("Aguardando inicialização do webservice para iniciar o timer de refresh...");
+				try {
+					Thread.sleep(1000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			ScheduleExpression se = new ScheduleExpression();
+			// Set schedule to every 60 seconds (starting at second 0 of every minute).
+			String s = "0/" + Prop.getInt("wake.up.timer.in.min") * 60;
+			se.hour("*").minute("*").second(s);
+			timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
+		}
 	}
 
 	@PreDestroy

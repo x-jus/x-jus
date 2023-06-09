@@ -80,6 +80,8 @@ public class Prop {
 		provider.addPublicProperty("working.hours.start", "8");
 		provider.addPublicProperty("working.hours.end", "17");
 
+		provider.addPublicProperty("wake.up.timer.in.min", "1");
+
 		provider.addRestrictedProperty("status.dir", "/var/tmp");
 		provider.addPublicProperty("indexes");
 		for (String i : getList("indexes")) {

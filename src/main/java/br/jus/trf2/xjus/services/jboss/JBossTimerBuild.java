@@ -1,7 +1,5 @@
 package br.jus.trf2.xjus.services.jboss;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -12,19 +10,11 @@ import javax.ejb.Timeout;
 import javax.ejb.Timer;
 import javax.ejb.TimerConfig;
 import javax.ejb.TimerService;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSConsumer;
-import javax.jms.JMSContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
-import com.crivano.swaggerservlet.SwaggerUtils;
 
 import br.jus.trf2.xjus.XjusFactory;
+import br.jus.trf2.xjus.XjusServlet;
 import br.jus.trf2.xjus.services.IPersistence;
+import br.jus.trf2.xjus.util.Prop;
 
 /**
  * Demonstrates how to use the EJB's @Timeout.
@@ -48,10 +38,27 @@ public class JBossTimerBuild {
 
 	@PostConstruct
 	public void initialize() {
-		ScheduleExpression se = new ScheduleExpression();
-		// Set schedule to every 60 seconds (starting at second 30 of every minute).
-		se.hour("*").minute("*").second("30/60");
-		timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
+		Runnable r = new StartTimer();
+		Thread th = new Thread(r, "Start-Timer-Build");
+		th.start();
+	}
+
+	private class StartTimer implements Runnable {
+		public void run() {
+			while (XjusServlet.getInstance() == null) {
+				System.out.println("Aguardando inicialização do webservice para iniciar o timer de build...");
+				try {
+					Thread.sleep(1000L);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			ScheduleExpression se = new ScheduleExpression();
+			// Set schedule to every 60 seconds (starting at second 30 of every minute).
+			String s = Prop.getInt("wake.up.timer.in.min") * 30 + "/" + Prop.getInt("wake.up.timer.in.min") * 60;
+			se.hour("*").minute("*").second(s);
+			timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
+		}
 	}
 
 	@PreDestroy
