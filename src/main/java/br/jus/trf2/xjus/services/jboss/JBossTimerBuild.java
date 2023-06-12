@@ -55,8 +55,10 @@ public class JBossTimerBuild {
 			}
 			ScheduleExpression se = new ScheduleExpression();
 			// Set schedule to every 60 seconds (starting at second 30 of every minute).
-			String s = Prop.getInt("wake.up.timer.in.min") * 30 + "/" + Prop.getInt("wake.up.timer.in.min") * 60;
-			se.hour("*").minute("*").second(s);
+			Integer mins = Prop.getInt("wake.up.timer.in.min");
+			String m = (mins / 2) + "/" + mins;
+			String s = (mins & 1) == 0 ? "0" : "30";
+			se.hour("*").minute(m).second(s);
 			timerService.createCalendarTimer(se, new TimerConfig("EJB timer service timeout at ", false));
 		}
 	}
