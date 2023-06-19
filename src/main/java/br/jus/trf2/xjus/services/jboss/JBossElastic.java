@@ -156,7 +156,7 @@ public class JBossElastic implements ISearch {
 			builder.addProperty("title", r.title);
 
 		if (r.acl != null) {
-			String[] split = r.acl.split(";");
+			String[] split = r.acl.split(",");
 			JsonArray acl = new JsonArray();
 			for (String s : split)
 				acl.add(s);
