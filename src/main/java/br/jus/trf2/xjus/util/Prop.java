@@ -77,8 +77,8 @@ public class Prop {
 			provider.addPrivateProperty("elasticsearch.auth.basic.password", null);
 		provider.addPublicProperty("elasticsearch.ssl.skip.hostname.verification", "false");
 
-		provider.addPublicProperty("working.hours.start", "8");
-		provider.addPublicProperty("working.hours.end", "17");
+		provider.addPublicProperty("working.hours.start", "6");
+		provider.addPublicProperty("working.hours.end", "20");
 
 		provider.addPublicProperty("wake.up.timer.in.min", "1");
 

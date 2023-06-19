@@ -152,6 +152,26 @@ paths:
           description: Error ocurred
           schema:
             $ref: "#/definitions/Error"
+  /index/{idx}/record/{id}/reindex:
+    post:
+      description: Invalida o registro e marca ele para ser reindexado
+      tags: [index]
+      parameters: 
+        - $ref: "#/parameters/idx"
+        - $ref: "#/parameters/id"
+        - $ref: "#/parameters/sync"
+      responses:
+        200:
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: "#/definitions/Id"
+        500:
+          description: Error ocurred
+          schema:
+            $ref: "#/definitions/Error"
             
   /task/build-step:
     get:

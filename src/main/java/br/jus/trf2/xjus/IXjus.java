@@ -226,6 +226,20 @@ public interface IXjus {
 		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
 	}
 
+	public interface IIndexIdxRecordIdReindexPost extends ISwaggerMethod {
+		public static class Request implements ISwaggerRequest {
+			public String idx;
+			public String id;
+			public Boolean sync;
+		}
+
+		public static class Response implements ISwaggerResponse {
+			public String id;
+		}
+
+		public void run(Request req, Response resp, XjusContext ctx) throws Exception;
+	}
+
 	public interface ITaskBuildStepGet extends ISwaggerMethod {
 		public static class Request implements ISwaggerRequest {
 		}

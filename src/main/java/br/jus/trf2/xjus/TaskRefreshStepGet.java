@@ -21,7 +21,7 @@ public class TaskRefreshStepGet implements IXjus.ITaskRefreshStepGet {
 		try (IPersistence dao = XjusFactory.getDao()) {
 			List<Index> l = dao.loadIndexes();
 			for (Index idx : l) {
-				if (idx.getActive() && 0 != idx.getMaxRefresh()) {
+				if (idx.getActive() && 0 != idx.getCurrentMaxRefresh()) {
 					queue.addRefreshIndex(idx.getIdx());
 				}
 			}
